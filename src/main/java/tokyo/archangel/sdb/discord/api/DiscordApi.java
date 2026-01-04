@@ -33,7 +33,7 @@ public class DiscordApi {
 		String url = objectMapper.readTree(response).get("url").asString();
 
 		log.debug("ゲートウェイURL取得完了");
-		log.trace("url:" + url);
+		log.trace("取得url: " + url);
 
 		return url;
 	}

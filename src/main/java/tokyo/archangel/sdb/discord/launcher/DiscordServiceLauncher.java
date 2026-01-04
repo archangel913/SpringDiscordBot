@@ -39,11 +39,11 @@ public class DiscordServiceLauncher implements CommandLineRunner {
 		// websocket生成
 		WebSocketClient client = new StandardWebSocketClient();
 
-		log.debug("websocket接続開始");
+		log.debug("ランチャー: websocket接続開始");
 		client.execute(discordWebSocketHandler, gatewayUrl)
 				.whenComplete((session, ex) -> {
 					if (Objects.isNull(ex)) {
-						log.debug("websocket接続完了");
+						log.debug("ランチャー: websocket接続完了");
 					} else {
 						log.error("websocket接続失敗", ex);
 					}

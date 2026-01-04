@@ -1,31 +1,32 @@
 package tokyo.archangel.sdb.discord.servicies.opcode;
 
 import java.io.IOException;
-import java.util.Objects;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
+import tokyo.archangel.sdb.discord.dto.opcode.code1.Code1Dto;
+import tools.jackson.databind.ObjectMapper;
 
+@Component
+@Scope("prototype")
 @Slf4j
-public class HeartBeatOpCodeService extends AbstractOpCodeService {
-	private static final String OP_CODE = "1";
+public class OpCode1Service extends AbstractOpCodeService {
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	private String sequence;
+	private Code1Dto dto;
 
-	public HeartBeatOpCodeService(WebSocketSession session, String sequence) {
+	public OpCode1Service(Code1Dto dto, WebSocketSession session) {
 		super(session);
+		this.dto = dto;
 	}
 
 	@Override
 	public void exec() {
-		String json = "{\"op\":" + OP_CODE + ",\"d\":";
-		if (Objects.isNull(sequence)) {
-			json += "null}";
-		} else {
-			json += sequence + "}";
-		}
+		String json = objectMapper.writeValueAsString(dto);
 
 		try {
 			session.sendMessage(new TextMessage(json));

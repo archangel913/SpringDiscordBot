@@ -19,14 +19,14 @@ public class MainDiscordWebSocketHandler extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		// 接続時に呼ばれるメソッド
-		log.debug("接続されました");
+		log.debug("メインWebSocket: 接続されました");
 	}
 	
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         // テクストを受信したときに呼ばれるメソッド
 		String payload = message.getPayload();
-        log.trace("受信メッセージ: " + payload);
+        log.trace("メインWebSocket: 受信メッセージ: " + payload);
         
         discordMainService.receive(payload, session);
 
@@ -36,7 +36,7 @@ public class MainDiscordWebSocketHandler extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
 		// 切断時に呼ばれるメソッド
-		log.debug("切断されました");
+		log.debug("メインWebSocket: 切断されました");
 		log.debug(status.getReason());
 	}
 }
