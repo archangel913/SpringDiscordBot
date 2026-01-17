@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "sdb.botToken",
+    "type": "java.lang.String",
+    "description": "discordボットトークン"
+  },
+  {
+    "name": "sdb.websocketMessageSizeLimit",
+    "type": "java.lang.Integer",
+    "description": "websocketの送受信最大サイズ（単位バイト）"
+  }
+]}

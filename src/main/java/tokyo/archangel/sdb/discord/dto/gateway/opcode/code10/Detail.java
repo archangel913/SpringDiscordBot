@@ -1,4 +1,4 @@
-package tokyo.archangel.sdb.discord.dto.opcode.code10;
+package tokyo.archangel.sdb.discord.dto.gateway.opcode.code10;
 
 import java.util.List;
 

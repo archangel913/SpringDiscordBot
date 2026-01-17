@@ -8,31 +8,32 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.discord.servicies.DiscordMainService;
+import tokyo.archangel.sdb.ApplicationProperties;
+import tokyo.archangel.sdb.discord.servicies.gateway.GatewayService;
 
 @Component
 @Slf4j
-public class MainDiscordWebSocketHandler extends TextWebSocketHandler {
+public class GatewayWebSocketHandler extends TextWebSocketHandler {
 	@Autowired
-	private DiscordMainService discordMainService;
+	private GatewayService discordMainService;
 	
+	@Autowired
+	private ApplicationProperties properties;
+
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		// 接続時に呼ばれるメソッド
 		log.debug("メインWebSocket: 接続されました");
+		session.setTextMessageSizeLimit(properties.getWebsocketMessageSizeLimit());
 	}
-	
-	@Override
-	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        // テクストを受信したときに呼ばれるメソッド
-		String payload = message.getPayload();
-        log.trace("メインWebSocket: 受信メッセージ: " + payload);
-        
-        discordMainService.receive(payload, session);
 
-        
-    }
-	
+	@Override
+	public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+		// テクストを受信したときに呼ばれるメソッド
+		String payload = message.getPayload();
+		discordMainService.receive(payload, session);
+	}
+
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
 		// 切断時に呼ばれるメソッド
