@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketSession;
 
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.ServiceClassNameInterface;
@@ -24,18 +23,7 @@ public class OpcodeServiceFactory {
 	 * @param session
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
-	public OpcodeServiceInterface create(OpCodeBaseDto baseDto, WebSocketSession session) {
-		OpcodeServiceInterface service = gatewayOpCodeServices.get(((ServiceClassNameInterface)baseDto).getServiceClassName());
-		if(service == null) {
-			return null;
-		}
-		
-		// 不用意にセッターを使わせないために専用のインターフェースへキャスト
-		OpcodeSetterInterface init = (OpcodeSetterInterface) service;
-		init.setSession(session);
-		init.setDto(baseDto);
-		
-		return (OpcodeServiceInterface) service;
+	public OpcodeServiceInterface create(OpCodeBaseDto baseDto) {
+		return gatewayOpCodeServices.get(((ServiceClassNameInterface)baseDto).getServiceClassName());
 	}
 }

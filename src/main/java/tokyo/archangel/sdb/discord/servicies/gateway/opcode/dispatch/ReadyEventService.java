@@ -9,44 +9,33 @@ import tokyo.archangel.sdb.discord.dto.gateway.OpCodeBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.Code0Dto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.ready.ReadyDetail;
 import tokyo.archangel.sdb.discord.servicies.gateway.opcode.OpcodeServiceInterface;
-import tokyo.archangel.sdb.discord.servicies.gateway.opcode.OpcodeSetterInterface;
 
-@SuppressWarnings("deprecation")
 @Service
 @Slf4j
-public class ReadyEventService implements OpcodeServiceInterface, OpcodeSetterInterface {
+public class ReadyEventService implements OpcodeServiceInterface {
 	private GatewayInfo gatewayInfo;
-
-	private Long sequence;
-
-	private ReadyDetail dto;
 
 	public ReadyEventService(GatewayInfo gatewayInfo) {
 		this.gatewayInfo = gatewayInfo;
 	}
 
 	@Override
-	public void setSession(WebSocketSession session) {
-		// TODO 自動生成されたメソッド・スタブ
-	}
-
-	@Override
-	public void setDto(OpCodeBaseDto dto) {
-		if (dto instanceof Code0Dto && ((Code0Dto) dto).getDetail() instanceof ReadyDetail) {
-			this.sequence = ((Code0Dto) dto).getSequence();
-			this.dto = (ReadyDetail) ((Code0Dto) dto).getDetail();
-		} else {
-			throw new ClassCastException("想定外の型です");
-		}
-	}
-
-	@Override
-	public void exec() {
+	public void exec(WebSocketSession session, OpCodeBaseDto dto) {
 		log.info("readyイベントを受け取りました");
+		Long sequence;
+		ReadyDetail readyDetail;
+		if (dto instanceof Code0Dto && ((Code0Dto) dto).getDetail() instanceof ReadyDetail) {
+			Code0Dto code0Dto = (Code0Dto) dto;
+			sequence = code0Dto.getSequence();
+			readyDetail = (ReadyDetail) ((Code0Dto) dto).getDetail();
+		} else {
+			log.warn("想定外の型のため処理を実行しません");
+			return;
+		}
 
 		// 各種必要なボット情報を設定する
 		gatewayInfo.setSequence(sequence);
-		gatewayInfo.setReadyDetail(dto);
+		gatewayInfo.setReadyDetail(readyDetail);
 	}
 
 }

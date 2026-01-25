@@ -7,6 +7,7 @@ import org.springframework.web.socket.WebSocketSession;
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeBaseDto;
 import tokyo.archangel.sdb.discord.servicies.gateway.opcode.OpcodeServiceFactory;
+import tokyo.archangel.sdb.discord.servicies.gateway.opcode.OpcodeServiceInterface;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
@@ -24,16 +25,17 @@ public class GatewayService {
 	public void receive(String json, WebSocketSession session) {
 		log.trace("受信メッセージ: " + json);
 		try {
-			
-			if (objectMapper.readTree(json).get("op").asInt() == 0
-					&& !objectMapper.readTree(json).get("t").asString().equals("READY")) {
-				log.warn("パスします");
+			OpCodeBaseDto baseDto = objectMapper.readValue(json, OpCodeBaseDto.class);
+			OpcodeServiceInterface service = codeServiceFactory.create(baseDto);
+			if(service == null) {
+				log.warn("サービスの取得に失敗しました。");
 				return;
 			}
-			OpCodeBaseDto baseDto = objectMapper.readValue(json, OpCodeBaseDto.class);
-			codeServiceFactory.create(baseDto, session).exec();
+			service.exec(session, baseDto);
 		} catch (JacksonException e) {
 			log.warn("jsonのパースに失敗しました。何も行いません。", e);
+		} catch (Exception e) {
+			log.warn("例外が発生しました。", e);
 		}
 	}
 }
