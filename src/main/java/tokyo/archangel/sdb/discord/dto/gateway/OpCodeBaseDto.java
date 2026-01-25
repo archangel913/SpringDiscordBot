@@ -10,6 +10,7 @@ import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.Code0Dto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code1.Code1Dto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code10.Code10Dto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code11.Code11Dto;
+import tokyo.archangel.sdb.discord.dto.gateway.opcode.code7.Code7Dto;
 import tokyo.archangel.sdb.discord.enumeration.DispatchEvent;
 import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
 
@@ -23,7 +24,9 @@ import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
 		@JsonSubTypes.Type(value = Bike.class, name = "4"),
 		@JsonSubTypes.Type(value = Car.class, name = "5"),
 		@JsonSubTypes.Type(value = Bike.class, name = "6"),
-		@JsonSubTypes.Type(value = Car.class, name = "7"),
+		*/
+		@JsonSubTypes.Type(value = Code7Dto.class, name = "7"),
+		/*
 		@JsonSubTypes.Type(value = Bike.class, name = "8"),
 		@JsonSubTypes.Type(value = Car.class, name = "9"),
 		*/
