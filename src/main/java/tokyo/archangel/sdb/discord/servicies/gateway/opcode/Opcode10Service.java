@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.discord.dto.gateway.OpCodeBaseDto;
+import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code10.Code10Dto;
 import tokyo.archangel.sdb.discord.servicies.gateway.GatewayHeartBeatService;
 
@@ -21,7 +21,7 @@ public class Opcode10Service implements OpcodeServiceInterface {
 	}
 
 	@Override
-	public void exec(WebSocketSession session, OpCodeBaseDto dto) {
+	public void exec(WebSocketSession session, OpCodeReceiveBaseDto dto) {
 		int interval;
 		if (dto instanceof Code10Dto) {
 			interval = ((Code10Dto) dto).getDetail().getHeartbeatInterval();

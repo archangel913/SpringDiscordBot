@@ -5,7 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import tokyo.archangel.sdb.discord.dto.gateway.OpCodeBaseDto;
+import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.ServiceClassNameInterface;
 
 @Component
@@ -23,7 +23,7 @@ public class OpcodeServiceFactory {
 	 * @param session
 	 * @return
 	 */
-	public OpcodeServiceInterface create(OpCodeBaseDto baseDto) {
+	public OpcodeServiceInterface create(OpCodeReceiveBaseDto baseDto) {
 		return gatewayOpCodeServices.get(((ServiceClassNameInterface)baseDto).getServiceClassName());
 	}
 }

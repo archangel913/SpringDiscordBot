@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 
 @Value
-public class Detail {
+public class Code2Detail {
 	@JsonProperty("token")
 	private String token;
 	

@@ -5,8 +5,8 @@ import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.GatewayInfo;
-import tokyo.archangel.sdb.discord.dto.gateway.OpCodeBaseDto;
-import tokyo.archangel.sdb.discord.servicies.gateway.ReconnectionWaitThreads;
+import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
+import tokyo.archangel.sdb.discord.servicies.gateway.GatewayHeartBeatCheckService;
 
 /**
  * gatewayからopcode10を受け取った時に実行するサービス
@@ -14,20 +14,21 @@ import tokyo.archangel.sdb.discord.servicies.gateway.ReconnectionWaitThreads;
 @Component
 @Slf4j
 public class Opcode11Service implements OpcodeServiceInterface {
-	private ReconnectionWaitThreads reconnectionWaitThreads;
+	private GatewayHeartBeatCheckService gatewayHeartBeatCheckService;
 
 	private GatewayInfo gatewayInfo;
 
-	public Opcode11Service(ReconnectionWaitThreads reconnectionWaitThreads, GatewayInfo gatewayInfo) {
-		this.reconnectionWaitThreads = reconnectionWaitThreads;
+	public Opcode11Service(GatewayHeartBeatCheckService gatewayHeartBeatCheckService, GatewayInfo gatewayInfo) {
+		this.gatewayHeartBeatCheckService = gatewayHeartBeatCheckService;
 		this.gatewayInfo = gatewayInfo;
 	}
 
 	@Override
-	public void exec(WebSocketSession session, OpCodeBaseDto dto) {
+	public void exec(WebSocketSession session, OpCodeReceiveBaseDto dto) {
 		log.debug("ハートビートを確認しました");
-		reconnectionWaitThreads.remove().interrupt();
-
-		gatewayInfo.setSequence(dto.getSequence());
+		gatewayHeartBeatCheckService.remove();
+		if (dto.getSequence() != null) {
+			gatewayInfo.setSequence(dto.getSequence());
+		}
 	}
 }

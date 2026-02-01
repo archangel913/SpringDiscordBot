@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import tokyo.archangel.sdb.discord.dto.gateway.NotImplementCodeDto;
-import tokyo.archangel.sdb.discord.dto.gateway.OpCodeBaseDto;
+import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.ServiceClassNameInterface;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.ready.ReadyDetail;
 import tokyo.archangel.sdb.discord.enumeration.DispatchEvent;
@@ -16,7 +16,7 @@ import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
 
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class Code0Dto extends OpCodeBaseDto implements ServiceClassNameInterface{
+public class Code0Dto extends OpCodeReceiveBaseDto implements ServiceClassNameInterface{
 
 	@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "t", visible = true, defaultImpl = NotImplementCodeDto.class)
 	@JsonSubTypes({

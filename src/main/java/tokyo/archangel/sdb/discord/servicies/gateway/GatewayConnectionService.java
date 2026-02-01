@@ -26,7 +26,7 @@ public class GatewayConnectionService {
 		client.execute(discordWebSocketHandler, url)
 				.whenComplete((session, ex) -> {
 					if (Objects.isNull(ex)) {
-						log.debug("websocket接続完了");
+						log.info("websocket接続完了");
 					} else {
 						log.error("websocket接続失敗", ex);
 					}

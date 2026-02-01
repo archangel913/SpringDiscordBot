@@ -1,4 +1,4 @@
-package tokyo.archangel.sdb.discord.dto.gateway.opcode.code2;
+package tokyo.archangel.sdb.discord.dto.gateway.opcode.code6;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -9,12 +9,12 @@ import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
 
 @Value
 @EqualsAndHashCode(callSuper=true)
-public class Code2Dto extends OpCodeSendBaseDto{
+public class Code6Dto extends OpCodeSendBaseDto{
 	@JsonProperty("d")
-	private Code2Detail detail;
+	private Code6Detail detail;
 
-	public Code2Dto(Code2Detail detail) {
-		super(GatewayOpCode.IDENTIFY);
+	public Code6Dto(Code6Detail detail) {
+		super(GatewayOpCode.RESUME);
 		this.detail = detail;
 	}
 }
