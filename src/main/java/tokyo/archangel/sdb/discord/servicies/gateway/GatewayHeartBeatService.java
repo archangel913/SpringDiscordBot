@@ -1,6 +1,7 @@
 package tokyo.archangel.sdb.discord.servicies.gateway;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
@@ -20,6 +21,7 @@ import tokyo.archangel.sdb.discord.dto.gateway.opcode.code2.Code2Dto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code2.Properties;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code6.Code6Detail;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code6.Code6Dto;
+import tokyo.archangel.sdb.discord.enumeration.Intent;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -109,11 +111,11 @@ public class GatewayHeartBeatService {
 		String token = properties.getBotToken();
 		String os = environment.getProperty("os.name");
 		String libName = environment.getProperty("spring.application.name");
-		Properties properties = new Properties(os, libName, libName);
+		Properties property = new Properties(os, libName, libName);
 
-		// TODO インテントを実装する
-		// 現状は最低限の1を設定
-		Code2Detail detail = new Code2Detail(token, properties, 1);
+		List<Intent> intents =  properties.getIntents();
+		int intent = Intent.buildIntent(intents);
+		Code2Detail detail = new Code2Detail(token, property, intent);
 		return new Code2Dto(detail);
 	}
 

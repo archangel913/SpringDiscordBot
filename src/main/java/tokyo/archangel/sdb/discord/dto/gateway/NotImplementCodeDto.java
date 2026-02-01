@@ -7,12 +7,12 @@ public class NotImplementCodeDto extends OpCodeReceiveBaseDto{
 
 	public NotImplementCodeDto(GatewayOpCode opCode, DispatchEvent eventName, Long sequence) {
 		super(opCode, eventName, sequence);
-		// TODO 自動生成されたコンストラクター・スタブ
+		// モック
 	}
 
 	@Override
 	public String getServiceClassName() {
-		// TODO 自動生成されたメソッド・スタブ
+		// モック
 		return null;
 	}
 

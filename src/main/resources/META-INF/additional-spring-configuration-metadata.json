@@ -8,5 +8,10 @@
     "name": "sdb.websocketMessageSizeLimit",
     "type": "java.lang.Integer",
     "description": "websocketの送受信最大サイズ（単位バイト）"
+  },
+  {
+    "name": "sdb.intents",
+    "type": "tokyo.archangel.sdb.discord.enumeration.Intent",
+    "description": "ボットに許可するインテンツ'"
   }
 ]}
