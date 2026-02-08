@@ -25,6 +25,11 @@ public class ApplicationProperties {
 	private String botToken;
 	
 	/**
+	 * ディスコードへメッセージを送信するレート制限
+	 */
+	private int websocketSendRateLimit;
+	
+	/**
 	 * websocketの送受信最大サイズ（単位バイト）
 	 */
 	private int websocketMessageSizeLimit;

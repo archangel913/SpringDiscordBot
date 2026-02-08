@@ -1,7 +1,6 @@
 package tokyo.archangel.sdb.discord.servicies.gateway.opcode;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
@@ -22,7 +21,7 @@ public class Opcode1Service implements OpcodeServiceInterface {
 	}
 
 	@Override
-	public void exec(WebSocketSession session, OpCodeReceiveBaseDto dto) {
+	public void exec(OpCodeReceiveBaseDto dto) {
 		Code1SendDto send;
 		if (dto instanceof Code1ReceiveDto) {
 			send = new Code1SendDto(((Code1ReceiveDto)dto).getD());
@@ -32,6 +31,6 @@ public class Opcode1Service implements OpcodeServiceInterface {
 		}
 
 		log.debug("discordのレスポンスでハートビートを送信します");
-		gatewayHeartBeatService.sendHeartBeat(send, session);
+		gatewayHeartBeatService.sendHeartBeat(send);
 	}
 }

@@ -1,7 +1,6 @@
 package tokyo.archangel.sdb.discord.servicies.gateway.opcode.dispatch;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.GatewayInfo;
@@ -20,7 +19,7 @@ public class ReadyEventService implements OpcodeServiceInterface {
 	}
 
 	@Override
-	public void exec(WebSocketSession session, OpCodeReceiveBaseDto dto) {
+	public void exec(OpCodeReceiveBaseDto dto) {
 		log.info("readyイベントを受け取りました");
 		Long sequence;
 		ReadyDetail readyDetail;

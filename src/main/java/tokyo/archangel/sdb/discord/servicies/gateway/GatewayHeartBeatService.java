@@ -1,6 +1,5 @@
 package tokyo.archangel.sdb.discord.servicies.gateway;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -8,8 +7,6 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.ApplicationProperties;
@@ -34,6 +31,8 @@ public class GatewayHeartBeatService {
 
 	private GatewayHeartBeatCheckService gatewayHeartBeatCheckService;
 
+	private GatewaySendMessageService gatewaySendMessageService;
+
 	private GatewayInfo gatewayInfo;
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
@@ -42,15 +41,17 @@ public class GatewayHeartBeatService {
 
 	public GatewayHeartBeatService(Environment environment, ApplicationProperties properties,
 			GatewayHeartBeatCheckService gatewayHeartBeatCheckService,
-			GatewayInfo gatewayInfo) {
+			GatewayInfo gatewayInfo, GatewaySendMessageService gatewaySendMessageService) {
 		this.environment = environment;
 		this.properties = properties;
 		this.gatewayHeartBeatCheckService = gatewayHeartBeatCheckService;
 		this.gatewayInfo = gatewayInfo;
+		this.gatewayHeartBeatCheckService = gatewayHeartBeatCheckService;
+		this.gatewaySendMessageService = gatewaySendMessageService;
 	}
 
 	@Async
-	public CompletableFuture<Void> run(int interval, WebSocketSession session) {
+	public CompletableFuture<Void> run(int interval) {
 		gatewayHeartBeatCheckService.setHeartbeatThread(Thread.currentThread());
 		gatewayHeartBeatCheckService.run();
 
@@ -64,13 +65,13 @@ public class GatewayHeartBeatService {
 			log.debug("Identifyオペコードを送信します");
 		}
 
-		sendMessage(session, json);
+		sendMessage(json);
 
 		try {
 			Thread.sleep((long) (interval * random.nextDouble()));
 			while (true) {
 				log.debug("バックグラウンドでハートビートを送信します");
-				sendHeartBeat(new Code1SendDto(gatewayInfo.getSequence()), session);
+				sendHeartBeat(new Code1SendDto(gatewayInfo.getSequence()));
 				Thread.sleep(interval);
 			}
 		} catch (InterruptedException e) {
@@ -80,31 +81,20 @@ public class GatewayHeartBeatService {
 		log.info("ハートビートスレッドが終了しました。WebSocketを切断します。");
 
 		// websocketの切断
-		try {
-			log.debug("websocketを切断します");
-			session.close();
-			log.info("discordから切断完了。");
-		} catch (IOException e) {
-			log.error("discordの切断中にエラーが発生しました。", e);
-		}
+		gatewaySendMessageService.close();
 
 		log.debug("ハートビートスレッドが完了しました");
 		return CompletableFuture.completedFuture(null);
 	}
 
-	public void sendHeartBeat(Code1SendDto dto, WebSocketSession session) {
+	public void sendHeartBeat(Code1SendDto dto) {
 		gatewayHeartBeatCheckService.addWait();
 		String json = objectMapper.writeValueAsString(dto);
-		sendMessage(session, json);
+		sendMessage(json);
 	}
 
-	private void sendMessage(WebSocketSession session, String json) {
-		try {
-			session.sendMessage(new TextMessage(json));
-			log.trace("送信内容：" + json);
-		} catch (IOException e) {
-			log.error("メッセージ送信中にエラーが発生しました。", e);
-		}
+	private void sendMessage(String json) {
+		gatewaySendMessageService.sendMessage(json);
 	}
 
 	private Code2Dto generateCode2Dto() {
@@ -113,7 +103,7 @@ public class GatewayHeartBeatService {
 		String libName = environment.getProperty("spring.application.name");
 		Properties property = new Properties(os, libName, libName);
 
-		List<Intent> intents =  properties.getIntents();
+		List<Intent> intents = properties.getIntents();
 		int intent = Intent.buildIntent(intents);
 		Code2Detail detail = new Code2Detail(token, property, intent);
 		return new Code2Dto(detail);

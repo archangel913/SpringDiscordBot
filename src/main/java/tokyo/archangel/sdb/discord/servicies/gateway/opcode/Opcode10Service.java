@@ -1,7 +1,6 @@
 package tokyo.archangel.sdb.discord.servicies.gateway.opcode;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
@@ -21,7 +20,7 @@ public class Opcode10Service implements OpcodeServiceInterface {
 	}
 
 	@Override
-	public void exec(WebSocketSession session, OpCodeReceiveBaseDto dto) {
+	public void exec(OpCodeReceiveBaseDto dto) {
 		int interval;
 		if (dto instanceof Code10Dto) {
 			interval = ((Code10Dto) dto).getDetail().getHeartbeatInterval();
@@ -29,6 +28,6 @@ public class Opcode10Service implements OpcodeServiceInterface {
 			log.warn("必要なデータが揃っていないため処理を実行しません");
 			return;
 		}
-		gatewayHeartBeatService.run(interval, session);
+		gatewayHeartBeatService.run(interval);
 	}
 }

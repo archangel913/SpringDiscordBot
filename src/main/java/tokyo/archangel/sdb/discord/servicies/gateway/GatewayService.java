@@ -1,7 +1,6 @@
 package tokyo.archangel.sdb.discord.servicies.gateway;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
@@ -25,11 +24,11 @@ public class GatewayService {
 		this.opcodeServiceFactory = opcodeServiceFactory;
 	}
 	
-	public void receive(String json, WebSocketSession session) {
+	public void receive(String json) {
 		log.trace("受信メッセージ: " + json);
 		try {
 			OpCodeReceiveBaseDto baseDto = objectMapper.readValue(json, OpCodeReceiveBaseDto.class);
-			receive(baseDto, session);
+			receive(baseDto);
 		} catch (JacksonException e) {
 			log.warn("jsonのパースに失敗しました。何も行いません。");
 		} catch (Exception e) {
@@ -37,12 +36,12 @@ public class GatewayService {
 		}
 	}
 
-	public void receive(OpCodeReceiveBaseDto baseDto, WebSocketSession session) {
+	public void receive(OpCodeReceiveBaseDto baseDto) {
 		OpcodeServiceInterface service = opcodeServiceFactory.create(baseDto);
 		if (service == null) {
 			log.warn("サービスの取得に失敗しました。");
 			return;
 		}
-		service.exec(session, baseDto);
+		service.exec(baseDto);
 	}
 }

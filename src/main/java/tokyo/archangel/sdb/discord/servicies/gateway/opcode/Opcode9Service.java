@@ -1,7 +1,6 @@
 package tokyo.archangel.sdb.discord.servicies.gateway.opcode;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.GatewayInfo;
@@ -22,7 +21,7 @@ public class Opcode9Service implements OpcodeServiceInterface {
 	}
 
 	@Override
-	public void exec(WebSocketSession session, OpCodeReceiveBaseDto dto) {
+	public void exec(OpCodeReceiveBaseDto dto) {
 		Code9Dto code9dto;
 		if (dto instanceof Code9Dto) {
 			code9dto = (Code9Dto) dto;

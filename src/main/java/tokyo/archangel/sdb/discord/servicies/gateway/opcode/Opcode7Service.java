@@ -1,7 +1,6 @@
 package tokyo.archangel.sdb.discord.servicies.gateway.opcode;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.GatewayInfo;
@@ -21,7 +20,7 @@ public class Opcode7Service implements OpcodeServiceInterface {
 	}
 
 	@Override
-	public void exec(WebSocketSession session, OpCodeReceiveBaseDto dto) {
+	public void exec(OpCodeReceiveBaseDto dto) {
 		log.info("再接続します。");
 		gatewayInfo.setReconnectMode(ReconnectMode.NORMAL);
 		gatewayHeartBeatCheckService.stopHeartBeatCheak();

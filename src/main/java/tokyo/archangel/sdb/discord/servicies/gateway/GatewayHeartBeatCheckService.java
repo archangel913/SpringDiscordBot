@@ -33,7 +33,7 @@ public class GatewayHeartBeatCheckService {
 	}
 
 	public void addWait() {
-		queue.add(LocalDateTime.now());
+		queue.add(LocalDateTime.now().plusSeconds(10));
 	}
 
 	public void remove() {
@@ -54,7 +54,7 @@ public class GatewayHeartBeatCheckService {
 
 				// ハートビートが返ってきているか確認
 				LocalDateTime time = queue.peek();
-				LocalDateTime now = LocalDateTime.now().plusSeconds(10);
+				LocalDateTime now = LocalDateTime.now();
 				if (time != null && time.isBefore(now)) {
 					log.warn("ハートビートが確認できませんでした。");
 					gatewayInfo.setReconnectMode(ReconnectMode.NORMAL);

@@ -13,5 +13,10 @@
     "name": "sdb.intents",
     "type": "tokyo.archangel.sdb.discord.enumeration.Intent",
     "description": "ボットに許可するインテンツ'"
+  },
+  {
+    "name": "sdb.websocketSendRateLimit",
+    "type": "java.lang.Long",
+    "description": "ディスコードへメッセージを送信するレート制限。デフォルト500"
   }
 ]}

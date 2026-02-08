@@ -14,6 +14,7 @@ import tokyo.archangel.sdb.discord.api.DiscordApi;
 import tokyo.archangel.sdb.discord.component.GatewayInfo;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.discord.servicies.gateway.GatewayConnectionService;
+import tokyo.archangel.sdb.discord.servicies.gateway.GatewaySendMessageService;
 import tokyo.archangel.sdb.discord.servicies.gateway.GatewayService;
 
 @Component
@@ -28,16 +29,19 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 	private GatewayInfo gatewayInfo;
 
 	private GatewayConnectionService gatewayConnectionService;
+	
+	private GatewaySendMessageService gatewaySendMessageService;
 
 	private boolean isShuttingDown = false;
 
 	public GatewayWebSocketHandler(GatewayService discordMainService, DiscordApi api, ApplicationProperties properties,
-			GatewayInfo gatewayInfo, @Lazy GatewayConnectionService gatewayConnectionService) {
+			GatewayInfo gatewayInfo, @Lazy GatewayConnectionService gatewayConnectionService, GatewaySendMessageService gatewaySendMessageService) {
 		this.discordMainService = discordMainService;
 		this.api = api;
 		this.properties = properties;
 		this.gatewayInfo = gatewayInfo;
 		this.gatewayConnectionService = gatewayConnectionService;
+		this.gatewaySendMessageService = gatewaySendMessageService;
 	}
 
 	@Override
@@ -45,13 +49,18 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 		// 接続時に呼ばれるメソッド
 		log.debug("メインWebSocket: 接続されました");
 		session.setTextMessageSizeLimit(properties.getWebsocketMessageSizeLimit());
+		
+		// セッション更新
+		// メッセージ送信スレッド起動
+		gatewaySendMessageService.setSession(session);
+		gatewaySendMessageService.exec();
 	}
 
 	@Override
 	public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		// テキストを受信したときに呼ばれるメソッド
 		String payload = message.getPayload();
-		discordMainService.receive(payload, session);
+		discordMainService.receive(payload);
 	}
 
 	@Override
@@ -63,8 +72,6 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 		if (isShuttingDown) {
 			return;
 		}
-
-		Thread.sleep(5000);
 
 		// TODO ステータスコードを使用して再接続する
 		// 再接続URL取得
@@ -84,6 +91,7 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 
 	@PreDestroy
 	public void onShutdown() {
+		log.debug("シャットダウンフラグを設定します");
 		this.isShuttingDown = true;
 	}
 }
