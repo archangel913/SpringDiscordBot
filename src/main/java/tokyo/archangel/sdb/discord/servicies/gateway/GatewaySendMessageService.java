@@ -2,8 +2,8 @@ package tokyo.archangel.sdb.discord.servicies.gateway;
 
 import java.io.IOException;
 import java.util.Queue;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -21,18 +21,21 @@ import tokyo.archangel.sdb.ApplicationProperties;
 @Service
 @Slf4j
 public class GatewaySendMessageService {
-	
+
 	private ApplicationProperties properties;
-	
+
 	private Queue<String> messageQueue = new ConcurrentLinkedQueue<>();
 
 	private WebSocketSession session;
 
 	private Thread sendMesageThread;
-	
+
+	private final AtomicBoolean isRunning = new AtomicBoolean(false);
+
 	public GatewaySendMessageService(ApplicationProperties properties) {
 		this.properties = properties;
 	}
+
 	/**
 	 * websocket送信用セッションを設定する
 	 * @param session
@@ -42,7 +45,8 @@ public class GatewaySendMessageService {
 	}
 
 	/**
-	 * 
+	 * メッセージを送信する<br>
+	 * 内部的には送信待ちキューに追加する
 	 * @param message
 	 */
 	public void sendMessage(String message) {
@@ -68,21 +72,22 @@ public class GatewaySendMessageService {
 	 * @return
 	 */
 	@Async
-	public CompletableFuture<Void> exec() {
-		// スレッド重複起動防止
-		if (sendMesageThread != null && sendMesageThread.isAlive()) {
-			log.debug("重複しているのでスレッド起動しません。");
-			return CompletableFuture.completedFuture(null);
+	public void exec() {
+		// 重複起動防止
+		if (!isRunning.compareAndSet(false, true)) {
+			log.debug("sendMesageThreadがすでに存在します。");
+			return;
 		}
-		
-		log.debug("レート制限スレッド起動");
-		sendMesageThread = Thread.currentThread();
 
+		sendMesageThread = Thread.currentThread();
+		sendMesageThread.setName("sendMesage");
+		log.debug("レート制限スレッド起動");
+		
 		try {
-			while (sendMesageThread.isAlive()) {
+			while (!sendMesageThread.isInterrupted()) {
 				// レート制限に達しないように待機する
 				Thread.sleep(properties.getWebsocketSendRateLimit());
-				
+
 				// キューに送信内容があれば送信する				
 				if (!messageQueue.isEmpty()) {
 					String message = messageQueue.peek();
@@ -102,7 +107,7 @@ public class GatewaySendMessageService {
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
-		return CompletableFuture.completedFuture(null);
+		isRunning.set(false);
 	}
 
 	@PreDestroy

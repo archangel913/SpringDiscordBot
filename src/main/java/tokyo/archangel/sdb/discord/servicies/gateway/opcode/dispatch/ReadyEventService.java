@@ -35,6 +35,7 @@ public class ReadyEventService implements OpcodeServiceInterface {
 		// 各種必要なボット情報を設定する
 		gatewayInfo.setSequence(sequence);
 		gatewayInfo.setReadyDetail(readyDetail);
+		gatewayInfo.setConnectionFailCount(0);
 	}
 
 }

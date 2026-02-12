@@ -2,8 +2,8 @@ package tokyo.archangel.sdb.discord.servicies.gateway;
 
 import java.time.LocalDateTime;
 import java.util.Queue;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -13,6 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.GatewayInfo;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
 
+/**
+ * ハートビートを監視するクラス<br>
+ * ハートビートが返ってこなかった時にハートビートを停止する。
+ */
 @Service
 @Slf4j
 public class GatewayHeartBeatCheckService {
@@ -21,9 +25,11 @@ public class GatewayHeartBeatCheckService {
 	private Thread heartBeatThread;
 
 	private Thread heartBeatCheakThread;
+	
+	private final AtomicBoolean isRunning = new AtomicBoolean(false);
 
 	private Queue<LocalDateTime> queue = new ConcurrentLinkedQueue<LocalDateTime>();
-	
+
 	public GatewayHeartBeatCheckService(GatewayInfo gatewayInfo) {
 		this.gatewayInfo = gatewayInfo;
 	}
@@ -40,16 +46,25 @@ public class GatewayHeartBeatCheckService {
 		queue.poll();
 	}
 
+	/**
+	 * ハートビートが返ってきているかを確認するメソッド<br>
+	 * 一度起動されたら、プログラム終了まで走り続ける
+	 * @return
+	 */
 	@Async
-	public CompletableFuture<Void> run() {
-		heartBeatCheakThread = Thread.currentThread();
-		if (heartBeatThread == null) {
-			log.warn("heartBeatThreadがnullです。待機を実行しません");
-			return CompletableFuture.completedFuture(null);
+	public void exec() {
+		// 重複起動防止
+		if (!isRunning.compareAndSet(false, true)) {
+			log.debug("heartBeatCheakThreadがすでに存在します。");
+			return;
 		}
 
+		heartBeatCheakThread = Thread.currentThread();
+		heartBeatCheakThread.setName("heartBeatCheak");
+		log.debug("heartBeatCheakThreadを起動します");
+
 		try {
-			while (true) {
+			while (!heartBeatCheakThread.isInterrupted()) {
 				Thread.sleep(10000);
 
 				// ハートビートが返ってきているか確認
@@ -61,23 +76,28 @@ public class GatewayHeartBeatCheckService {
 					break;
 				}
 			}
+			// すでに実行されているハートビートを停止させる
+			log.warn("ハートビートスレッドを停止します");
+			if (heartBeatThread == null) {
+				log.warn("heartBeatThreadがnullです。停止処理を実行しません");
+				heartBeatThread.interrupt();
+			}
+			queue.clear();
+
 		} catch (InterruptedException e) {
 			// 終了処理を行うため握りつぶす
 			Thread.currentThread().interrupt();
 		}
 
-		// すでに実行されているハートビートを停止させる
-		log.debug("ハートビートスレッドを停止します");
-		heartBeatThread.interrupt();
-		queue.clear();
-
 		log.debug("ハートビートチェックスレッドが完了しました");
-
-		return CompletableFuture.completedFuture(null);
+		isRunning.set(false);
 	}
 
 	@PreDestroy
 	public void stopHeartBeatCheak() {
-		heartBeatCheakThread.interrupt();
+		if (heartBeatCheakThread != null) {
+			heartBeatCheakThread.interrupt();
+		}
+
 	}
 }

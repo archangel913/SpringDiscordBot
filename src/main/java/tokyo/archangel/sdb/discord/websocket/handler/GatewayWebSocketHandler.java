@@ -1,5 +1,7 @@
 package tokyo.archangel.sdb.discord.websocket.handler;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -14,6 +16,7 @@ import tokyo.archangel.sdb.discord.api.DiscordApi;
 import tokyo.archangel.sdb.discord.component.GatewayInfo;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.discord.servicies.gateway.GatewayConnectionService;
+import tokyo.archangel.sdb.discord.servicies.gateway.GatewayHeartBeatService;
 import tokyo.archangel.sdb.discord.servicies.gateway.GatewaySendMessageService;
 import tokyo.archangel.sdb.discord.servicies.gateway.GatewayService;
 
@@ -29,19 +32,26 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 	private GatewayInfo gatewayInfo;
 
 	private GatewayConnectionService gatewayConnectionService;
-	
+
 	private GatewaySendMessageService gatewaySendMessageService;
+	
+	private GatewayHeartBeatService gatewayHeartBeatService;
+
+	private ApplicationContext context;
 
 	private boolean isShuttingDown = false;
 
 	public GatewayWebSocketHandler(GatewayService discordMainService, DiscordApi api, ApplicationProperties properties,
-			GatewayInfo gatewayInfo, @Lazy GatewayConnectionService gatewayConnectionService, GatewaySendMessageService gatewaySendMessageService) {
+			GatewayInfo gatewayInfo, @Lazy GatewayConnectionService gatewayConnectionService,
+			GatewaySendMessageService gatewaySendMessageService, GatewayHeartBeatService gatewayHeartBeatService ,ApplicationContext context) {
 		this.discordMainService = discordMainService;
 		this.api = api;
 		this.properties = properties;
 		this.gatewayInfo = gatewayInfo;
 		this.gatewayConnectionService = gatewayConnectionService;
 		this.gatewaySendMessageService = gatewaySendMessageService;
+		this.gatewayHeartBeatService = gatewayHeartBeatService;
+		this.context = context;
 	}
 
 	@Override
@@ -49,7 +59,7 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 		// 接続時に呼ばれるメソッド
 		log.debug("メインWebSocket: 接続されました");
 		session.setTextMessageSizeLimit(properties.getWebsocketMessageSizeLimit());
-		
+
 		// セッション更新
 		// メッセージ送信スレッド起動
 		gatewaySendMessageService.setSession(session);
@@ -67,13 +77,33 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
 		// 切断時に呼ばれるメソッド
 		log.debug("メインWebSocket: 切断されました");
+		log.debug(String.valueOf(status.getCode()));
 		log.debug(status.getReason());
-
+		
+		// シャットダウン中なら後続処理を行わない
 		if (isShuttingDown) {
 			return;
 		}
 
 		// TODO ステータスコードを使用して再接続する
+		// ステータスコードを見てアプリを落とすかどうか判断する
+		if (status.getCode() == 4004) {
+			// いったんベタ打ち
+			int failCount = gatewayInfo.getConnectionFailCount() + 1;
+
+			if (failCount > 5) {
+				// 既定回数以上失敗したらアプリケーションを落とす
+				log.error("接続に5回連続で失敗しました。アプリケーションを終了します。");
+				SpringApplication.exit(context, () -> 1);
+				return;
+			}
+
+			gatewayInfo.setConnectionFailCount(failCount);
+		}
+		
+		// ハートビート停止
+		gatewayHeartBeatService.stopHeartBeat();
+
 		// 再接続URL取得
 		String connectUrl;
 		if (gatewayInfo.getReconnectMode() == ReconnectMode.NORMAL) {

@@ -1,8 +1,19 @@
 package tokyo.archangel.sdb.discord.enumeration;
 
 public enum ReconnectMode {
+	/**
+	 * 初回起動
+	 */
 	NONE("none"),
+	
+	/**
+	 * 再接続用URL使用
+	 */
 	NORMAL("normal"),
+	
+	/**
+	 * トークンを使用して再接続
+	 */
 	HARD("hard");
 	
 	private final String mode;
