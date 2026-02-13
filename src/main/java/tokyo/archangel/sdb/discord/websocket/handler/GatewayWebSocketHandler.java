@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.ApplicationProperties;
 import tokyo.archangel.sdb.discord.api.DiscordApi;
 import tokyo.archangel.sdb.discord.component.GatewayInfo;
+import tokyo.archangel.sdb.discord.enumeration.GatewayWebsocketCode;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.discord.servicies.gateway.GatewayConnectionService;
 import tokyo.archangel.sdb.discord.servicies.gateway.GatewayHeartBeatService;
@@ -34,7 +35,7 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 	private GatewayConnectionService gatewayConnectionService;
 
 	private GatewaySendMessageService gatewaySendMessageService;
-	
+
 	private GatewayHeartBeatService gatewayHeartBeatService;
 
 	private ApplicationContext context;
@@ -43,7 +44,8 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 
 	public GatewayWebSocketHandler(GatewayService discordMainService, DiscordApi api, ApplicationProperties properties,
 			GatewayInfo gatewayInfo, @Lazy GatewayConnectionService gatewayConnectionService,
-			GatewaySendMessageService gatewaySendMessageService, GatewayHeartBeatService gatewayHeartBeatService ,ApplicationContext context) {
+			GatewaySendMessageService gatewaySendMessageService, GatewayHeartBeatService gatewayHeartBeatService,
+			ApplicationContext context) {
 		this.discordMainService = discordMainService;
 		this.api = api;
 		this.properties = properties;
@@ -75,34 +77,40 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+		// TODO 1006 対策
+		// Unexpected Status of SSLEngineResult after an unwrap() operation
+		
 		// 切断時に呼ばれるメソッド
 		log.debug("メインWebSocket: 切断されました");
 		log.debug(String.valueOf(status.getCode()));
 		log.debug(status.getReason());
 		
+		// ハートビート停止
+		gatewayHeartBeatService.stopHeartBeat();
+
 		// シャットダウン中なら後続処理を行わない
 		if (isShuttingDown) {
 			return;
 		}
 
-		// TODO ステータスコードを使用して再接続する
-		// ステータスコードを見てアプリを落とすかどうか判断する
-		if (status.getCode() == 4004) {
-			// いったんベタ打ち
+		// ステータスコードによって再接続処理を切り替える
+		GatewayWebsocketCode code = GatewayWebsocketCode.getGatewayWebsocketCode(status.getCode());
+		if (code != GatewayWebsocketCode.NORMAL_CLOSURE && code != GatewayWebsocketCode.GOING_AWAY) {
+			// 異常終了だった場合
 			int failCount = gatewayInfo.getConnectionFailCount() + 1;
-
 			if (failCount > 5) {
 				// 既定回数以上失敗したらアプリケーションを落とす
 				log.error("接続に5回連続で失敗しました。アプリケーションを終了します。");
 				SpringApplication.exit(context, () -> 1);
 				return;
 			}
-
 			gatewayInfo.setConnectionFailCount(failCount);
+
+			// 再接続不可の場合、認証からやり直す
+			if (!code.canReconnect()) {
+				gatewayInfo.setReconnectMode(ReconnectMode.HARD);
+			}
 		}
-		
-		// ハートビート停止
-		gatewayHeartBeatService.stopHeartBeat();
 
 		// 再接続URL取得
 		String connectUrl;
@@ -116,7 +124,6 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 		// ディスコード再接続
 		gatewayConnectionService.connect(connectUrl);
 		log.info("再接続が完了しました");
-
 	}
 
 	@PreDestroy

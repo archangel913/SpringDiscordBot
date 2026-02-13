@@ -23,6 +23,7 @@ public class DiscordApi {
 	}
 
 	public String getGatewayUrl() {
+		// TODO 再取得処理実装
 		log.debug("ゲートウェイURL取得開始");
 
 		String response = restClient.get()
