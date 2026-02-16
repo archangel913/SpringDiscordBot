@@ -3,7 +3,6 @@ package tokyo.archangel.sdb.discord.servicies.gateway.opcode;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.discord.component.GatewayInfo;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.servicies.gateway.GatewayHeartBeatCheckService;
 
@@ -15,19 +14,13 @@ import tokyo.archangel.sdb.discord.servicies.gateway.GatewayHeartBeatCheckServic
 public class Opcode11Service implements OpcodeServiceInterface {
 	private GatewayHeartBeatCheckService gatewayHeartBeatCheckService;
 
-	private GatewayInfo gatewayInfo;
-
-	public Opcode11Service(GatewayHeartBeatCheckService gatewayHeartBeatCheckService, GatewayInfo gatewayInfo) {
+	public Opcode11Service(GatewayHeartBeatCheckService gatewayHeartBeatCheckService) {
 		this.gatewayHeartBeatCheckService = gatewayHeartBeatCheckService;
-		this.gatewayInfo = gatewayInfo;
 	}
 
 	@Override
 	public void exec(OpCodeReceiveBaseDto dto) {
 		log.debug("ハートビートを確認しました");
 		gatewayHeartBeatCheckService.remove();
-		if (dto.getSequence() != null) {
-			gatewayInfo.setSequence(dto.getSequence());
-		}
 	}
 }

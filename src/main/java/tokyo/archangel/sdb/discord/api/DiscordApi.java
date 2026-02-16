@@ -23,18 +23,32 @@ public class DiscordApi {
 	}
 
 	public String getGatewayUrl() {
-		// TODO 再取得処理実装
 		log.debug("ゲートウェイURL取得開始");
 
-		String response = restClient.get()
-				.uri(BASE_URL + "gateway")
-				.retrieve()
-				.body(String.class);
+		String url;
+		int errorCount = 0;
+		while (true) {
+			try {
+				String response = restClient.get()
+						.uri(BASE_URL + "gateway")
+						.retrieve()
+						.body(String.class);
 
-		String url = objectMapper.readTree(response).get("url").asString();
-
-		log.debug("ゲートウェイURL取得完了");
-		log.trace("取得url: " + url);
+				url = objectMapper.readTree(response).get("url").asString();
+			} catch (Exception e) {
+				log.warn("URLの取得に失敗しました。再取得します。");
+				try {
+					Thread.sleep((long)(Math.pow(2, errorCount)) * 1000);
+				} catch (InterruptedException sleepEx) {
+					// 中断されても何もしない
+				}
+				errorCount++;
+				continue;
+			}
+			log.debug("ゲートウェイURL取得完了");
+			log.trace("取得url: " + url);
+			break;
+		}
 
 		return url;
 	}

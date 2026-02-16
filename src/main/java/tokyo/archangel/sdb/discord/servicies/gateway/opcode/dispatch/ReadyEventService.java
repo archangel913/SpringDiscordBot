@@ -21,11 +21,8 @@ public class ReadyEventService implements OpcodeServiceInterface {
 	@Override
 	public void exec(OpCodeReceiveBaseDto dto) {
 		log.info("readyイベントを受け取りました");
-		Long sequence;
 		ReadyDetail readyDetail;
 		if (dto instanceof Code0Dto && ((Code0Dto) dto).getDetail() instanceof ReadyDetail) {
-			Code0Dto code0Dto = (Code0Dto) dto;
-			sequence = code0Dto.getSequence();
 			readyDetail = (ReadyDetail) ((Code0Dto) dto).getDetail();
 		} else {
 			log.warn("想定外の型のため処理を実行しません");
@@ -33,7 +30,6 @@ public class ReadyEventService implements OpcodeServiceInterface {
 		}
 
 		// 各種必要なボット情報を設定する
-		gatewayInfo.setSequence(sequence);
 		gatewayInfo.setReadyDetail(readyDetail);
 		gatewayInfo.setConnectionFailCount(0);
 	}
