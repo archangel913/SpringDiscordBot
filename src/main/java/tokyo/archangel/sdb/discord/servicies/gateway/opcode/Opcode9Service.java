@@ -9,6 +9,9 @@ import tokyo.archangel.sdb.discord.dto.gateway.opcode.code9.Code9Dto;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.discord.servicies.gateway.GatewayHeartBeatService;
 
+/**
+ * gatewayからopcode9を受け取った時に実行するサービス
+ */
 @Service
 @Slf4j
 public class Opcode9Service implements OpcodeServiceInterface {
