@@ -6,7 +6,8 @@ package tokyo.archangel.sdb.discord.enumeration;
 public enum DispatchEvent {
 	
 	READY("READY"),
-	GUILD_CREATE("GUILD_CREATE");
+	GUILD_CREATE("GUILD_CREATE"),
+	VOICE_SERVER_UPDATE("VOICE_SERVER_UPDATE");
 	
 	private final String eventName;
 	

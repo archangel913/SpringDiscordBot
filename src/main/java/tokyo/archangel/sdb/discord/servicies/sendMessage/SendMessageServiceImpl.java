@@ -1,10 +1,10 @@
-package tokyo.archangel.sdb.discord.servicies.gateway;
+package tokyo.archangel.sdb.discord.servicies.sendMessage;
 
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
@@ -13,78 +13,62 @@ import org.springframework.web.socket.WebSocketSession;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.ApplicationProperties;
+import tokyo.archangel.sdb.discord.enumeration.ServiceThreadStatus;
 
 /**
  * メッセージの送信とレート制限を管理するサービス<br>
  * こちらからの切断もこのクラスから行う
  */
 @Service
+@Scope("prototype")
 @Slf4j
-public class GatewaySendMessageService {
-
+public class SendMessageServiceImpl implements SendMessageService {
 	private ApplicationProperties properties;
 
 	private Queue<String> messageQueue = new ConcurrentLinkedQueue<>();
 
 	private WebSocketSession session;
 
-	private Thread sendMesageThread;
+	private ServiceThreadStatus status;
+	
+	private Thread currentThread;
+	
+	private long channelId;
 
-	private final AtomicBoolean isRunning = new AtomicBoolean(false);
-
-	public GatewaySendMessageService(ApplicationProperties properties) {
+	public SendMessageServiceImpl(ApplicationProperties properties, WebSocketSession session, Long channelId) {
 		this.properties = properties;
-	}
-
-	/**
-	 * websocket送信用セッションを設定する
-	 * @param session
-	 */
-	public void setSession(WebSocketSession session) {
 		this.session = session;
+		this.channelId = channelId;
 	}
 
-	/**
-	 * メッセージを送信する<br>
-	 * 内部的には送信待ちキューに追加する
-	 * @param message
-	 */
+	@Override
+	public long getChannelId() {
+		return channelId;
+	}
+
+	@Override
+	public WebSocketSession getSession() {
+		return session;
+	}
+
+	@Override
 	public void sendMessage(String message) {
 		messageQueue.add(message);
 	}
 
-	/**
-	 * 接続を閉じる
-	 */
-	public void close() {
-		try {
-			log.debug("websocketを切断します");
-			session.close();
-			log.info("discordから切断完了。");
-		} catch (IOException e) {
-			log.error("discordの切断中にエラーが発生しました。", e);
-		}
-	}
-
-	/**
-	 * メッセージ送信メソッド<br>
-	 * 非同期で実行される
-	 * @return
-	 */
 	@Async
 	public void exec() {
-		// 重複起動防止
-		if (!isRunning.compareAndSet(false, true)) {
-			log.debug("sendMesageThreadがすでに存在します。");
+		if(status == ServiceThreadStatus.ACTIVE) {
+			log.debug("レート制限スレッドがすでに起動しています");
 			return;
 		}
-
-		sendMesageThread = Thread.currentThread();
-		sendMesageThread.setName("sendMesage");
+		status = ServiceThreadStatus.ACTIVE;
+		currentThread = Thread.currentThread();
+		currentThread.setName("sendMesage");
 		log.debug("レート制限スレッド起動");
-		
+
 		try {
-			while (!sendMesageThread.isInterrupted()) {
+			while (status == ServiceThreadStatus.ACTIVE) {
 				// レート制限に達しないように待機する
 				Thread.sleep(properties.getWebsocketSendRateLimit());
 
@@ -106,12 +90,21 @@ public class GatewaySendMessageService {
 			}
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
+		} finally {
+			try {
+				log.debug("websocketを切断します");
+				session.close();
+				log.info("discordから切断完了。");
+			} catch (IOException e) {
+				log.error("discordの切断中にエラーが発生しました。", e);
+			}
+			status = ServiceThreadStatus.TERMINATED;
 		}
-		isRunning.set(false);
 	}
 
 	@PreDestroy
-	public void stopSendMessageThread() {
-		sendMesageThread.interrupt();
+	public void dispose() {
+		status = ServiceThreadStatus.TERMINATING;
+		currentThread.interrupt();
 	}
 }

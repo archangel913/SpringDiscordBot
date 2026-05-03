@@ -10,7 +10,8 @@ import lombok.Value;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.enumeration.DispatchEvent;
 import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
-import tokyo.archangel.sdb.discord.servicies.gateway.opcode.Opcode7Service;
+import tokyo.archangel.sdb.discord.servicies.opcode.gateway.Opcode7Service;
+
 
 @Value
 @EqualsAndHashCode(callSuper=true)

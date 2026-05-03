@@ -8,6 +8,7 @@ import lombok.Value;
 import lombok.experimental.NonFinal;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code1.Code1SendDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code2.Code2Dto;
+import tokyo.archangel.sdb.discord.dto.gateway.opcode.code4.Code4Dto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code6.Code6Dto;
 import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
 
@@ -15,6 +16,7 @@ import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
 @JsonSubTypes({
 		@JsonSubTypes.Type(value = Code1SendDto.class, name = "1"),
 		@JsonSubTypes.Type(value = Code2Dto.class, name = "2"),
+		@JsonSubTypes.Type(value = Code4Dto.class, name = "4"),
 		@JsonSubTypes.Type(value = Code6Dto.class, name = "6")
 })
 @Value

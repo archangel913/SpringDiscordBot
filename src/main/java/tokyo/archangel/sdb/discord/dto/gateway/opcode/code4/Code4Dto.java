@@ -1,4 +1,4 @@
-package tokyo.archangel.sdb.discord.dto.gateway.opcode.code1;
+package tokyo.archangel.sdb.discord.dto.gateway.opcode.code4;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -9,12 +9,12 @@ import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
 
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class Code1SendDto extends OpCodeSendBaseDto {
+public class Code4Dto extends OpCodeSendBaseDto {
 	@JsonProperty("d")
-	private Long d;
+	private Code4Detail detail;
 
-	public Code1SendDto(Long d) {
-		super(GatewayOpCode.HEARTBEAT);
-		this.d = d;
+	public Code4Dto(Code4Detail detail) {
+		super(GatewayOpCode.VOICE_STATE_UPDATE);
+		this.detail = detail;
 	}
 }

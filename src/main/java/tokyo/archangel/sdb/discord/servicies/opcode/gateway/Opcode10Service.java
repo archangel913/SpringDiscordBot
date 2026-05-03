@@ -1,4 +1,4 @@
-package tokyo.archangel.sdb.discord.servicies.gateway.opcode;
+package tokyo.archangel.sdb.discord.servicies.opcode.gateway;
 
 import java.util.List;
 
@@ -10,6 +10,7 @@ import tokyo.archangel.sdb.ApplicationProperties;
 import tokyo.archangel.sdb.discord.component.GatewayInfo;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.ready.ReadyDetail;
+import tokyo.archangel.sdb.discord.dto.gateway.opcode.code1.Code1SendDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code10.Code10Dto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code2.Code2Detail;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code2.Code2Dto;
@@ -18,8 +19,10 @@ import tokyo.archangel.sdb.discord.dto.gateway.opcode.code6.Code6Detail;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code6.Code6Dto;
 import tokyo.archangel.sdb.discord.enumeration.Intent;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
-import tokyo.archangel.sdb.discord.servicies.gateway.GatewayHeartBeatService;
-import tokyo.archangel.sdb.discord.servicies.gateway.GatewaySendMessageService;
+import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatService;
+import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
+import tokyo.archangel.sdb.discord.servicies.opcode.OpcodeServiceInterface;
+import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -28,9 +31,9 @@ import tools.jackson.databind.ObjectMapper;
 @Service
 @Slf4j
 public class Opcode10Service implements OpcodeServiceInterface {
-	private GatewayHeartBeatService gatewayHeartBeatService;
+	private HeartBeatServiceProvider heartBeatServiceProvider;
 
-	private GatewaySendMessageService gatewaySendMessageService;
+	private SendMessageService sendMessageService;
 
 	private GatewayInfo gatewayInfo;
 
@@ -40,11 +43,9 @@ public class Opcode10Service implements OpcodeServiceInterface {
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	public Opcode10Service(GatewayHeartBeatService gatewayHeartBeatService,
-			GatewaySendMessageService gatewaySendMessageService, GatewayInfo gatewayInfo,
+	public Opcode10Service(HeartBeatServiceProvider heartBeatServiceProvider, GatewayInfo gatewayInfo,
 			Environment environment, ApplicationProperties properties) {
-		this.gatewayHeartBeatService = gatewayHeartBeatService;
-		this.gatewaySendMessageService = gatewaySendMessageService;
+		this.heartBeatServiceProvider = heartBeatServiceProvider;
 		this.gatewayInfo = gatewayInfo;
 		this.environment = environment;
 		this.properties = properties;
@@ -70,9 +71,17 @@ public class Opcode10Service implements OpcodeServiceInterface {
 			log.debug("Identifyオペコードを送信します");
 		}
 
-		gatewaySendMessageService.sendMessage(json);
+		sendMessageService.sendMessage(json);
+		HeartBeatService heartBeatService = heartBeatServiceProvider
+				.getHeartBeatService(sendMessageService.getSession());
+		heartBeatService.setSendMessageService(sendMessageService);
+		heartBeatService.setSendOpcode(Code1SendDto.class.getName());
+		heartBeatService.exec(interval);
+	}
 
-		gatewayHeartBeatService.exec(interval);
+	@Override
+	public void setSendSessageService(SendMessageService sendMessageService) {
+		this.sendMessageService = sendMessageService;
 	}
 
 	private Code2Dto generateCode2Dto() {

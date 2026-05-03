@@ -1,4 +1,4 @@
-package tokyo.archangel.sdb.discord.servicies.gateway.opcode.dispatch;
+package tokyo.archangel.sdb.discord.servicies.opcode.gateway.dispatch;
 
 import org.springframework.stereotype.Service;
 
@@ -7,7 +7,8 @@ import tokyo.archangel.sdb.discord.component.GatewayInfo;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.Code0Dto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.ready.ReadyDetail;
-import tokyo.archangel.sdb.discord.servicies.gateway.opcode.OpcodeServiceInterface;
+import tokyo.archangel.sdb.discord.servicies.opcode.OpcodeServiceInterface;
+import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 @Service
 @Slf4j
@@ -32,6 +33,10 @@ public class ReadyEventService implements OpcodeServiceInterface {
 		// 各種必要なボット情報を設定する
 		gatewayInfo.setReadyDetail(readyDetail);
 		gatewayInfo.setConnectionFailCount(0);
+	}
+
+	@Override
+	public void setSendSessageService(SendMessageService sendMessageService) {
 	}
 
 }

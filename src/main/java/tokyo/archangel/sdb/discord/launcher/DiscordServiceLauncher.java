@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.api.DiscordApi;
 import tokyo.archangel.sdb.discord.servicies.gateway.GatewayConnectionService;
-import tokyo.archangel.sdb.discord.servicies.gateway.GatewayHeartBeatCheckService;
 
 /**
  * ディスコードのメインサービスを発火させるクラス
@@ -18,13 +17,9 @@ public class DiscordServiceLauncher implements CommandLineRunner {
 
 	private GatewayConnectionService gatewayConnectionService;
 
-	private GatewayHeartBeatCheckService gatewayHeartBeatCheckService;
-
-	public DiscordServiceLauncher(GatewayConnectionService gatewayConnectionService, DiscordApi api,
-			GatewayHeartBeatCheckService gatewayHeartBeatCheckService) {
+	public DiscordServiceLauncher(GatewayConnectionService gatewayConnectionService, DiscordApi api) {
 		this.gatewayConnectionService = gatewayConnectionService;
 		this.api = api;
-		this.gatewayHeartBeatCheckService = gatewayHeartBeatCheckService;
 	}
 
 	@Override
@@ -37,8 +32,5 @@ public class DiscordServiceLauncher implements CommandLineRunner {
 
 		// websocket接続
 		gatewayConnectionService.connect(gatewayUrl);
-
-		// ハートビートチェックスレッド起動
-		gatewayHeartBeatCheckService.exec();
 	}
 }

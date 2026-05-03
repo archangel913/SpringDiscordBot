@@ -8,14 +8,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
-import tokyo.archangel.sdb.discord.dto.gateway.ServiceClassNameInterface;
 import tokyo.archangel.sdb.discord.enumeration.DispatchEvent;
 import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
-import tokyo.archangel.sdb.discord.servicies.gateway.opcode.Opcode9Service;
+import tokyo.archangel.sdb.discord.servicies.opcode.gateway.Opcode9Service;
 
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class Code9Dto extends OpCodeReceiveBaseDto implements ServiceClassNameInterface {
+public class Code9Dto extends OpCodeReceiveBaseDto {
 	@JsonProperty("d")
 	private Boolean d;
 

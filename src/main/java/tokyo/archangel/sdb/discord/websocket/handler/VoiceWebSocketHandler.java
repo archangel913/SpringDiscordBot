@@ -3,6 +3,7 @@ package tokyo.archangel.sdb.discord.websocket.handler;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -16,15 +17,16 @@ import tokyo.archangel.sdb.discord.api.DiscordApi;
 import tokyo.archangel.sdb.discord.component.GatewayInfo;
 import tokyo.archangel.sdb.discord.enumeration.GatewayWebsocketCode;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
-import tokyo.archangel.sdb.discord.servicies.gateway.GatewayConnectionService;
-import tokyo.archangel.sdb.discord.servicies.gateway.GatewayService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
+import tokyo.archangel.sdb.discord.servicies.voice.VoiceConnectionService;
+import tokyo.archangel.sdb.discord.servicies.voice.VoiceService;
 
 @Component
+@Scope("prototype")
 @Slf4j
-public class GatewayWebSocketHandler extends TextWebSocketHandler {
-	private GatewayService discordMainService;
+public class VoiceWebSocketHandler extends TextWebSocketHandler {
+	private VoiceService discordVoiceService;
 
 	private DiscordApi api;
 
@@ -32,22 +34,23 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 
 	private GatewayInfo gatewayInfo;
 
-	private GatewayConnectionService gatewayConnectionService;
-	
+	private VoiceConnectionService voiceConnectionService;
+
 	private SendMessageServiceProvider sendMessageServiceProvider;
 
 	private ApplicationContext context;
 
 	private boolean isShuttingDown = false;
 
-	public GatewayWebSocketHandler(GatewayService discordMainService, DiscordApi api, ApplicationProperties properties,
-			GatewayInfo gatewayInfo, @Lazy GatewayConnectionService gatewayConnectionService, SendMessageServiceProvider sendMessageServiceProvider,
+	public VoiceWebSocketHandler(VoiceService discordVoiceService, DiscordApi api, ApplicationProperties properties,
+			GatewayInfo gatewayInfo, @Lazy VoiceConnectionService voiceConnectionService,
+			SendMessageServiceProvider sendMessageServiceProvider,
 			ApplicationContext context) {
-		this.discordMainService = discordMainService;
+		this.discordVoiceService = discordVoiceService;
 		this.api = api;
 		this.properties = properties;
 		this.gatewayInfo = gatewayInfo;
-		this.gatewayConnectionService = gatewayConnectionService;
+		this.voiceConnectionService = voiceConnectionService;
 		this.sendMessageServiceProvider = sendMessageServiceProvider;
 		this.context = context;
 	}
@@ -55,31 +58,35 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		// 接続時に呼ばれるメソッド
-		log.debug("メインWebSocket: 接続されました");
+		log.debug("VoiceWebSocket: 接続されました");
 		session.setTextMessageSizeLimit(properties.getWebsocketMessageSizeLimit());
-		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session, -1);
-		service.exec();
+
+		// セッション更新
+		// メッセージ送信スレッド起動
+		SendMessageService sendMessageService = sendMessageServiceProvider.generateSendMessageService(session, 0);
+		sendMessageService.exec();
+
+		// 認証用のOpCode0を送信する
+
 	}
 
 	@Override
 	public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		// テキストを受信したときに呼ばれるメソッド
 		String payload = message.getPayload();
-		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session, -1);
-		discordMainService.receive(payload, service);
+		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session, 0);
+		discordVoiceService.receive(payload, service);
 	}
 
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
 		// TODO 1006 対策
 		// Unexpected Status of SSLEngineResult after an unwrap() operation
-		
+
 		// 切断時に呼ばれるメソッド
-		log.debug("メインWebSocket: 切断されました");
+		log.debug("VoiceWebSocket: 切断されました");
 		log.debug(String.valueOf(status.getCode()));
 		log.debug(status.getReason());
-		
-		// TODO 各スレッドの終了確認
 
 		// シャットダウン中なら後続処理を行わない
 		if (isShuttingDown) {
@@ -115,7 +122,7 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 		connectUrl += "/?v=10&encoding=json";
 
 		// ディスコード再接続
-		gatewayConnectionService.connect(connectUrl);
+		voiceConnectionService.connect(connectUrl);
 		log.info("再接続が完了しました");
 	}
 

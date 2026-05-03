@@ -34,7 +34,7 @@ import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
 })
 @Value
 @NonFinal
-public abstract class OpCodeReceiveBaseDto implements ServiceClassNameInterface{
+public abstract class OpCodeReceiveBaseDto implements OpecodeServiceInitializeable{
 	@JsonProperty("op")
 	private Integer opCode;
 	@JsonProperty("t")

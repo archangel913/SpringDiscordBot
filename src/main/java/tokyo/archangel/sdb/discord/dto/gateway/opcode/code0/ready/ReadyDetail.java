@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.EventDetailBase;
-import tokyo.archangel.sdb.discord.servicies.gateway.opcode.dispatch.ReadyEventService;
+import tokyo.archangel.sdb.discord.servicies.opcode.gateway.dispatch.ReadyEventService;
 
 @Value
 @EqualsAndHashCode(callSuper = true)

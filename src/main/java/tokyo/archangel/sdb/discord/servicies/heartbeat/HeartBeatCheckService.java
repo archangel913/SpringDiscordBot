@@ -1,10 +1,10 @@
-package tokyo.archangel.sdb.discord.servicies.gateway;
+package tokyo.archangel.sdb.discord.servicies.heartbeat;
 
 import java.time.LocalDateTime;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -12,30 +12,32 @@ import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.GatewayInfo;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
+import tokyo.archangel.sdb.discord.enumeration.ServiceThreadStatus;
 
 /**
- * ハートビートを監視するクラス<br>
+ * ハートビートが返ってきているか監視するクラス<br>
  * ハートビートが返ってこなかった時にハートビートを停止する。
  */
 @Service
+@Scope("prototype")
 @Slf4j
-public class GatewayHeartBeatCheckService {
+public class HeartBeatCheckService {
 	private GatewayInfo gatewayInfo;
 
-	private Thread heartBeatThread;
+	private HeartBeatServiceImpl heartBeatService;
 
-	private Thread heartBeatCheakThread;
-	
-	private final AtomicBoolean isRunning = new AtomicBoolean(false);
+	private ServiceThreadStatus status;
 
 	private Queue<LocalDateTime> queue = new ConcurrentLinkedQueue<LocalDateTime>();
+	
+	private Thread currentThread;
 
-	public GatewayHeartBeatCheckService(GatewayInfo gatewayInfo) {
+	public HeartBeatCheckService(GatewayInfo gatewayInfo) {
 		this.gatewayInfo = gatewayInfo;
 	}
 
-	public void setHeartbeatThread(Thread heartbeatThread) {
-		this.heartBeatThread = heartbeatThread;
+	public void setHeartbeatService(HeartBeatServiceImpl heartBeatService) {
+		this.heartBeatService = heartBeatService;
 	}
 
 	public void addWait() {
@@ -53,18 +55,17 @@ public class GatewayHeartBeatCheckService {
 	 */
 	@Async
 	public void exec() {
-		// 重複起動防止
-		if (!isRunning.compareAndSet(false, true)) {
-			log.debug("heartBeatCheakThreadがすでに存在します。");
+		if(status == ServiceThreadStatus.ACTIVE) {
+			log.debug("ハートビートチェックスレッドがすでに起動しています");
 			return;
 		}
-
-		heartBeatCheakThread = Thread.currentThread();
-		heartBeatCheakThread.setName("heartBeatCheak");
-		log.debug("heartBeatCheakThreadを起動します");
+		status = ServiceThreadStatus.ACTIVE;
+		currentThread = Thread.currentThread();
+		currentThread.setName("heartBeatCheak");
+		log.debug("ハートビートチェックスレッドを起動します");
 
 		try {
-			while (!heartBeatCheakThread.isInterrupted()) {
+			while (status == ServiceThreadStatus.ACTIVE) {
 				Thread.sleep(10000);
 
 				// ハートビートが返ってきているか確認
@@ -76,28 +77,27 @@ public class GatewayHeartBeatCheckService {
 					break;
 				}
 			}
-			// すでに実行されているハートビートを停止させる
-			log.warn("ハートビートスレッドを停止します");
-			if (heartBeatThread == null) {
-				log.warn("heartBeatThreadがnullです。停止処理を実行しません");
-				heartBeatThread.interrupt();
-			}
-			queue.clear();
-
 		} catch (InterruptedException e) {
 			// 終了処理を行うため握りつぶす
 			Thread.currentThread().interrupt();
+		} finally {
+			status = ServiceThreadStatus.TERMINATING;
+			// 実行されているハートビートを停止させる
+			log.warn("ハートビートスレッドを停止します");
+			if (heartBeatService != null) {
+				heartBeatService.stopHeartBeat();
+			} else {
+				log.warn("ハートビートサービスがnullです。サービスの停止を行いません。");
+			}
+			queue.clear();
+			status = ServiceThreadStatus.TERMINATED;
+			log.debug("ハートビートチェックスレッドが完了しました");
 		}
-
-		log.debug("ハートビートチェックスレッドが完了しました");
-		isRunning.set(false);
 	}
 
 	@PreDestroy
 	public void stopHeartBeatCheak() {
-		if (heartBeatCheakThread != null) {
-			heartBeatCheakThread.interrupt();
-		}
-
+		status = ServiceThreadStatus.TERMINATING;
+		currentThread.interrupt();
 	}
 }
