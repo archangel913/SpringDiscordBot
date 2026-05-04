@@ -3,7 +3,7 @@ package tokyo.archangel.sdb.discord.servicies.opcode.gateway;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.discord.component.GatewayInfo;
+import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code9.Code9Dto;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
@@ -53,6 +53,7 @@ public class Opcode9Service implements OpcodeServiceInterface {
 
 		HeartBeatService service = heartBeatServiceProvider.getHeartBeatService(sendMessageService.getSession());
 		service.stopHeartBeat();
+		 heartBeatServiceProvider.removeService(sendMessageService.getSession());
 	}
 
 	@Override

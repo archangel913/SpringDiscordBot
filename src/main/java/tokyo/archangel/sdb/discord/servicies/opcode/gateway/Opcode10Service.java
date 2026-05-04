@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.ApplicationProperties;
-import tokyo.archangel.sdb.discord.component.GatewayInfo;
+import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.ready.ReadyDetail;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code1.Code1SendDto;

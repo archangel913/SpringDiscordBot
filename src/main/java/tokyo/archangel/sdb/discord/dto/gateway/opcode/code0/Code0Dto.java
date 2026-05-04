@@ -11,6 +11,8 @@ import tokyo.archangel.sdb.discord.dto.gateway.NotImplementCodeDto;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.OpecodeServiceInitializeable;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.ready.ReadyDetail;
+import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.voicechannelstarttimeupdate.VoiceChannelStartTimeUpdateDetail;
+import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.voicechannelstatusupdate.VoiceChannelStatusUpdateDetail;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.voiceserverupdate.VoiceServerUpdateDetail;
 import tokyo.archangel.sdb.discord.enumeration.DispatchEvent;
 import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
@@ -23,6 +25,8 @@ public class Code0Dto extends OpCodeReceiveBaseDto {
 	@JsonSubTypes({
 			@JsonSubTypes.Type(value = ReadyDetail.class, name = "READY"),
 			@JsonSubTypes.Type(value = VoiceServerUpdateDetail.class, name = "VOICE_SERVER_UPDATE"),
+			@JsonSubTypes.Type(value = VoiceChannelStartTimeUpdateDetail.class, name = "VOICE_CHANNEL_START_TIME_UPDATE"),
+			@JsonSubTypes.Type(value = VoiceChannelStatusUpdateDetail.class, name = "VOICE_CHANNEL_STATUS_UPDATE"),
 	})
 	@JsonProperty("d")
 	private EventDetailBase detail;

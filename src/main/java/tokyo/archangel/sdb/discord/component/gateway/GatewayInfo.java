@@ -1,4 +1,4 @@
-package tokyo.archangel.sdb.discord.component;
+package tokyo.archangel.sdb.discord.component.gateway;
 
 import org.springframework.stereotype.Component;
 

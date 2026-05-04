@@ -13,7 +13,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.ApplicationProperties;
 import tokyo.archangel.sdb.discord.api.DiscordApi;
-import tokyo.archangel.sdb.discord.component.GatewayInfo;
+import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.discord.enumeration.GatewayWebsocketCode;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.discord.servicies.gateway.GatewayConnectionService;
@@ -55,7 +55,6 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		// 接続時に呼ばれるメソッド
-		log.debug("メインWebSocket: 接続されました");
 		session.setTextMessageSizeLimit(properties.getWebsocketMessageSizeLimit());
 		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session, -1);
 		service.exec();
@@ -71,15 +70,12 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-		// TODO 1006 対策
-		// Unexpected Status of SSLEngineResult after an unwrap() operation
-		
 		// 切断時に呼ばれるメソッド
-		log.debug("メインWebSocket: 切断されました");
+		log.debug("gatewayWebSocket: 切断されました");
 		log.debug(String.valueOf(status.getCode()));
 		log.debug(status.getReason());
 		
-		// TODO 各スレッドの終了確認
+		sendMessageServiceProvider.removeService(session);
 
 		// シャットダウン中なら後続処理を行わない
 		if (isShuttingDown) {
@@ -114,9 +110,9 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 		}
 		connectUrl += "/?v=10&encoding=json";
 
+		log.debug("再接続を行います");
 		// ディスコード再接続
 		gatewayConnectionService.connect(connectUrl);
-		log.info("再接続が完了しました");
 	}
 
 	@PreDestroy

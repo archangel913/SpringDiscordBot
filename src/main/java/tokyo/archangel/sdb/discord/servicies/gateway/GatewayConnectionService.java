@@ -26,7 +26,7 @@ public class GatewayConnectionService {
 		client.execute(discordWebSocketHandler, url)
 				.whenComplete((session, ex) -> {
 					if (Objects.isNull(ex)) {
-						log.info("websocket接続完了");
+						log.info("websocket接続完了。初期化処理に入ります。");
 					} else {
 						log.error("websocket接続失敗", ex);
 					}

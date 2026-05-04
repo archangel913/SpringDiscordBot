@@ -8,9 +8,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.discord.component.GatewayInfo;
+import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.discord.enumeration.ServiceThreadStatus;
 
@@ -95,7 +94,6 @@ public class HeartBeatCheckService {
 		}
 	}
 
-	@PreDestroy
 	public void stopHeartBeatCheak() {
 		status = ServiceThreadStatus.TERMINATING;
 		currentThread.interrupt();

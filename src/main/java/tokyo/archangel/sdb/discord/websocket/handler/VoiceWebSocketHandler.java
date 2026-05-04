@@ -14,7 +14,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.ApplicationProperties;
 import tokyo.archangel.sdb.discord.api.DiscordApi;
-import tokyo.archangel.sdb.discord.component.GatewayInfo;
+import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.discord.enumeration.GatewayWebsocketCode;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
@@ -57,8 +57,6 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-		// 接続時に呼ばれるメソッド
-		log.debug("VoiceWebSocket: 接続されました");
 		session.setTextMessageSizeLimit(properties.getWebsocketMessageSizeLimit());
 
 		// セッション更新
@@ -84,7 +82,7 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 		// Unexpected Status of SSLEngineResult after an unwrap() operation
 
 		// 切断時に呼ばれるメソッド
-		log.debug("VoiceWebSocket: 切断されました");
+		log.debug("voiceWebSocket: 切断されました");
 		log.debug(String.valueOf(status.getCode()));
 		log.debug(status.getReason());
 

@@ -8,12 +8,14 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
+import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.ApplicationProperties;
 
 /**
  * メッセージ送信用サービスを提供するクラス
  */
 @Service
+@Slf4j
 public class SendMessageServiceProvider {
 	private final ObjectProvider<SendMessageServiceImpl> serviceProvider;
 
@@ -54,5 +56,12 @@ public class SendMessageServiceProvider {
 		return null;
 	}
 
-	// TODO メモリリーク対策（マップの中身を削除する）
+	/**
+	 * メッセージ送信用クラスを削除する
+	 * @param session
+	 */
+	public void removeService(WebSocketSession session) {
+		sendMessageServices.remove(session.getId());
+		log.debug("ハートビートサービスを削除しました。現在有効なサービスは" + sendMessageServices.size() + "個です");
+	}
 }

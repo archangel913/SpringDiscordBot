@@ -21,7 +21,7 @@ public class VoiceServerUpdateEventService implements OpcodeServiceInterface {
 
 	@Override
 	public void exec(OpCodeReceiveBaseDto dto) {
-		log.info("VoiceServerUpdateイベントを受け取りました");
+		log.debug("VoiceServerUpdateイベントを受け取りました");
 		VoiceServerUpdateDetail detail;
 		if (dto instanceof Code0Dto && ((Code0Dto) dto).getDetail() instanceof VoiceServerUpdateDetail) {
 			detail = (VoiceServerUpdateDetail) ((Code0Dto) dto).getDetail();

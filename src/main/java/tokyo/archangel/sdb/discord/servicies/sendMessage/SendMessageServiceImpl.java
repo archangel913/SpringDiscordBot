@@ -59,13 +59,13 @@ public class SendMessageServiceImpl implements SendMessageService {
 	@Async
 	public void exec() {
 		if(status == ServiceThreadStatus.ACTIVE) {
-			log.debug("レート制限スレッドがすでに起動しています");
+			log.debug("メッセージ送信スレッドがすでに起動しています");
 			return;
 		}
 		status = ServiceThreadStatus.ACTIVE;
 		currentThread = Thread.currentThread();
 		currentThread.setName("sendMesage");
-		log.debug("レート制限スレッド起動");
+		log.debug("メッセージ送信スレッド起動");
 
 		try {
 			while (status == ServiceThreadStatus.ACTIVE) {

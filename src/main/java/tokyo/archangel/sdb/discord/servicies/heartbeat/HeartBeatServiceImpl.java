@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.discord.component.GatewayInfo;
+import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeSendBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code1.Code1SendDto;
 import tokyo.archangel.sdb.discord.enumeration.ServiceThreadStatus;
@@ -106,7 +106,7 @@ public class HeartBeatServiceImpl implements HeartBeatService {
 		}
 		status = ServiceThreadStatus.TERMINATING;
 		currentThread.interrupt();
-		log.debug("ハートビートスレッドを終了します。WebSocketを切断します。");
+		log.debug("ハートビートスレッドを終了します。");
 		// websocketの切断
 		sendMessageService.dispose();
 		log.debug("ハートビートスレッドが完了しました");
