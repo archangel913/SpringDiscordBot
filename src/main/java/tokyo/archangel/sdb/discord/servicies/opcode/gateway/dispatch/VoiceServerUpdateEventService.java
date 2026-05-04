@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.Code0Dto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.voiceserverupdate.VoiceServerUpdateDetail;
-import tokyo.archangel.sdb.discord.servicies.opcode.OpcodeServiceInterface;
+import tokyo.archangel.sdb.discord.servicies.opcode.gateway.OpcodeServiceInterface;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.voice.VoiceConnectionService;
 
@@ -30,13 +30,7 @@ public class VoiceServerUpdateEventService implements OpcodeServiceInterface {
 			return;
 		}
 
-		// TODO 音声接続処理実装
-		// まずはハートビートから
-
-		voiceConnectionService.connect("wss://" + detail.getEndpoint());
-
-		// TODO Voice State Updateの処理
-
+		voiceConnectionService.connect(detail);
 	}
 
 	@Override

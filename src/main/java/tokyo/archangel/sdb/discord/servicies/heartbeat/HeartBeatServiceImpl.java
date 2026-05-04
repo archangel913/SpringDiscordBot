@@ -9,8 +9,9 @@ import org.springframework.stereotype.Service;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
-import tokyo.archangel.sdb.discord.dto.gateway.OpCodeSendBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code1.Code1SendDto;
+import tokyo.archangel.sdb.discord.dto.voice.opcode.code3.Code3Detail;
+import tokyo.archangel.sdb.discord.dto.voice.opcode.code3.Code3Dto;
 import tokyo.archangel.sdb.discord.enumeration.ServiceThreadStatus;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tools.jackson.databind.ObjectMapper;
@@ -74,9 +75,9 @@ public class HeartBeatServiceImpl implements HeartBeatService {
 			Thread.sleep((long) (interval * random.nextDouble()));
 			while (status == ServiceThreadStatus.ACTIVE) {
 				log.debug("バックグラウンドでハートビートを送信します");
-				OpCodeSendBaseDto dto = generateDto();
-				if (dto != null) {
-					sendHeartBeat(dto);
+				String json = generateJson();
+				if (json != null) {
+					sendHeartBeat(json);
 				}
 				Thread.sleep(interval);
 			}
@@ -93,9 +94,8 @@ public class HeartBeatServiceImpl implements HeartBeatService {
 	}
 
 	@Override
-	public void sendHeartBeat(OpCodeSendBaseDto dto) {
+	public void sendHeartBeat(String json) {
 		HeartBeatCheckService.addWait();
-		String json = objectMapper.writeValueAsString(dto);
 		sendMessageService.sendMessage(json);
 	}
 
@@ -118,17 +118,18 @@ public class HeartBeatServiceImpl implements HeartBeatService {
 		HeartBeatCheckService.stopHeartBeatCheak();
 	}
 
-	private OpCodeSendBaseDto generateDto() {
-		OpCodeSendBaseDto dto = null;
+	private String generateJson() {
 		if (opcodeClassName == Code1SendDto.class.getName()) {
 			// ゲートウェイのハートビートの場合
-			dto = new Code1SendDto(gatewayInfo.getSequence());
-		} else if (opcodeClassName == Code1SendDto.class.getName()) {
+			return objectMapper.writeValueAsString(new Code1SendDto(gatewayInfo.getSequence()));
+		} else if (opcodeClassName == Code3Dto.class.getName()) {
 			// ボイスのハートビートの場合
-			dto = new Code1SendDto(gatewayInfo.getSequence());
+			// 使い捨ての値を取得
+			long nonce = random.nextLong();
+			return objectMapper.writeValueAsString(new Code3Dto(new Code3Detail(nonce, 0)));
 		} else {
 			log.warn("適切なOpCodeが設定されていないため、送信しません");
 		}
-		return dto;
+		return null;
 	}
 }

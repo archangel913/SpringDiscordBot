@@ -1,8 +1,5 @@
 package tokyo.archangel.sdb.discord.websocket.handler;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -10,16 +7,10 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.ApplicationProperties;
-import tokyo.archangel.sdb.discord.api.DiscordApi;
-import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
-import tokyo.archangel.sdb.discord.enumeration.GatewayWebsocketCode;
-import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
-import tokyo.archangel.sdb.discord.servicies.voice.VoiceConnectionService;
 import tokyo.archangel.sdb.discord.servicies.voice.VoiceService;
 
 @Component
@@ -28,41 +19,28 @@ import tokyo.archangel.sdb.discord.servicies.voice.VoiceService;
 public class VoiceWebSocketHandler extends TextWebSocketHandler {
 	private VoiceService discordVoiceService;
 
-	private DiscordApi api;
-
 	private ApplicationProperties properties;
-
-	private GatewayInfo gatewayInfo;
-
-	private VoiceConnectionService voiceConnectionService;
 
 	private SendMessageServiceProvider sendMessageServiceProvider;
 
-	private ApplicationContext context;
-
-	private boolean isShuttingDown = false;
-
-	public VoiceWebSocketHandler(VoiceService discordVoiceService, DiscordApi api, ApplicationProperties properties,
-			GatewayInfo gatewayInfo, @Lazy VoiceConnectionService voiceConnectionService,
-			SendMessageServiceProvider sendMessageServiceProvider,
-			ApplicationContext context) {
+	public VoiceWebSocketHandler(VoiceService discordVoiceService, ApplicationProperties properties,
+			SendMessageServiceProvider sendMessageServiceProvider) {
 		this.discordVoiceService = discordVoiceService;
-		this.api = api;
 		this.properties = properties;
-		this.gatewayInfo = gatewayInfo;
-		this.voiceConnectionService = voiceConnectionService;
 		this.sendMessageServiceProvider = sendMessageServiceProvider;
-		this.context = context;
 	}
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		session.setTextMessageSizeLimit(properties.getWebsocketMessageSizeLimit());
+		
+		// TODO 接続時にそのまま認証まで完了させる
+		// ここだとchannelIdを設定できない
 
 		// セッション更新
 		// メッセージ送信スレッド起動
-		SendMessageService sendMessageService = sendMessageServiceProvider.generateSendMessageService(session, 0);
-		sendMessageService.exec();
+		//SendMessageService sendMessageService = sendMessageServiceProvider.generateSendMessageService(session, 0);
+		//sendMessageService.exec();
 
 		// 認証用のOpCode0を送信する
 
@@ -86,6 +64,7 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 		log.debug(String.valueOf(status.getCode()));
 		log.debug(status.getReason());
 
+		/*
 		// シャットダウン中なら後続処理を行わない
 		if (isShuttingDown) {
 			return;
@@ -122,11 +101,6 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 		// ディスコード再接続
 		voiceConnectionService.connect(connectUrl);
 		log.info("再接続が完了しました");
-	}
-
-	@PreDestroy
-	public void onShutdown() {
-		log.debug("シャットダウンフラグを設定します");
-		this.isShuttingDown = true;
+		*/
 	}
 }

@@ -8,7 +8,6 @@ import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatService;
 import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
-import tokyo.archangel.sdb.discord.servicies.opcode.OpcodeServiceInterface;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 /**

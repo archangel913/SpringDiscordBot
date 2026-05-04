@@ -21,7 +21,6 @@ import tokyo.archangel.sdb.discord.enumeration.Intent;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatService;
 import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
-import tokyo.archangel.sdb.discord.servicies.opcode.OpcodeServiceInterface;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tools.jackson.databind.ObjectMapper;
 

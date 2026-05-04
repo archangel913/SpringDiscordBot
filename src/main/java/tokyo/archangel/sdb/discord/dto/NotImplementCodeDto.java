@@ -1,5 +1,6 @@
-package tokyo.archangel.sdb.discord.dto.gateway;
+package tokyo.archangel.sdb.discord.dto;
 
+import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.enumeration.DispatchEvent;
 import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
 

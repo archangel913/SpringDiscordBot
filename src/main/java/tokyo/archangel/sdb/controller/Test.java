@@ -19,7 +19,7 @@ public class Test {
 
 	@PostMapping("/test")
 	public void test() {
-		Code4Detail detail = new Code4Detail("1019297738640330803", "1140468827893809243", false, false);
+		Code4Detail detail = new Code4Detail("1019297738640330803", "1140987356892110951", false, false);
 
 		Code4Dto dto = new Code4Dto(detail);
 		

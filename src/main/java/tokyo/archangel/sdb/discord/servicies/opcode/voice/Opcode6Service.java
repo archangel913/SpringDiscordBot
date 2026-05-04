@@ -1,4 +1,4 @@
-package tokyo.archangel.sdb.discord.servicies.opcode.gateway;
+package tokyo.archangel.sdb.discord.servicies.opcode.voice;
 
 import org.springframework.stereotype.Service;
 
@@ -6,25 +6,23 @@ import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatService;
 import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
+import tokyo.archangel.sdb.discord.servicies.opcode.gateway.OpcodeServiceInterface;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
-/**
- * gatewayからopcode11を受け取った時に実行するサービス
- */
 @Service
 @Slf4j
-public class Opcode11Service implements OpcodeServiceInterface {
+public class Opcode6Service implements OpcodeServiceInterface {
+	
 	private HeartBeatServiceProvider heartBeatServiceProvider;
 
 	private SendMessageService sendMessageService;
-
-	public Opcode11Service(HeartBeatServiceProvider heartBeatServiceProvider) {
+	
+	public Opcode6Service(HeartBeatServiceProvider heartBeatServiceProvider) {
 		this.heartBeatServiceProvider = heartBeatServiceProvider;
 	}
-
 	@Override
 	public void exec(OpCodeReceiveBaseDto dto) {
-		log.debug("ハートビートを確認しました");
+		log.debug("voice: ハートビートを確認しました");
 		HeartBeatService service = heartBeatServiceProvider.getHeartBeatService(sendMessageService.getSession());
 		service.receiveAck();
 	}

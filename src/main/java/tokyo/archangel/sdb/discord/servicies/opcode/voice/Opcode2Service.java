@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
-import tokyo.archangel.sdb.discord.servicies.opcode.OpcodeServiceInterface;
+import tokyo.archangel.sdb.discord.servicies.opcode.gateway.OpcodeServiceInterface;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 @Service

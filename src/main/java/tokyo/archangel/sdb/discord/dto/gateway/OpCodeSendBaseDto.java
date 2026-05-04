@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import lombok.Value;
 import lombok.experimental.NonFinal;
+import tokyo.archangel.sdb.discord.dto.NotImplementCodeDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code1.Code1SendDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code2.Code2Dto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code4.Code4Dto;

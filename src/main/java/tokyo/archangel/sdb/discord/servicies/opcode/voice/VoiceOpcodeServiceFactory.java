@@ -4,8 +4,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
-import tokyo.archangel.sdb.discord.servicies.opcode.OpcodeServiceInterface;
+import tokyo.archangel.sdb.discord.dto.voice.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 @Component

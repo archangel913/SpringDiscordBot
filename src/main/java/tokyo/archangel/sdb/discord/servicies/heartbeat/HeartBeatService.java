@@ -1,6 +1,5 @@
 package tokyo.archangel.sdb.discord.servicies.heartbeat;
 
-import tokyo.archangel.sdb.discord.dto.gateway.OpCodeSendBaseDto;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 public interface HeartBeatService {
@@ -30,7 +29,7 @@ public interface HeartBeatService {
 	/**
 	 * ハートビートの送信を行う
 	 */
-	public void sendHeartBeat(OpCodeSendBaseDto dto);
+	public void sendHeartBeat(String json);
 	
 	/**
 	 * ハートビートを終了する

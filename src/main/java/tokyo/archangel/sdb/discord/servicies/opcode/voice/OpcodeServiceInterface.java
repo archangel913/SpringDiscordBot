@@ -1,6 +1,6 @@
-package tokyo.archangel.sdb.discord.servicies.opcode;
+package tokyo.archangel.sdb.discord.servicies.opcode.voice;
 
-import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
+import tokyo.archangel.sdb.discord.dto.voice.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 /**
