@@ -9,10 +9,10 @@ import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 @Component
 public class VoiceOpcodeServiceFactory {
-	private Map<String, OpcodeServiceInterface> gatewayOpCodeServices;
+	private Map<String, OpcodeServiceInterface> voiceOpCodeServices;
 	
-	public VoiceOpcodeServiceFactory(Map<String, OpcodeServiceInterface> gatewayOpCodeServices) {
-		this.gatewayOpCodeServices = gatewayOpCodeServices;
+	public VoiceOpcodeServiceFactory(Map<String, OpcodeServiceInterface> voiceOpCodeServices) {
+		this.voiceOpCodeServices = voiceOpCodeServices;
 	}
 
 	/**
@@ -22,7 +22,7 @@ public class VoiceOpcodeServiceFactory {
 	 * @return
 	 */
 	public OpcodeServiceInterface create(OpCodeReceiveBaseDto baseDto, SendMessageService sendMessageService) {
-		OpcodeServiceInterface service = gatewayOpCodeServices.get(baseDto.getServiceClassName());
+		OpcodeServiceInterface service = voiceOpCodeServices.get(baseDto.getServiceClassName());
 		service.setSendSessageService(sendMessageService);
 		return service;
 	}

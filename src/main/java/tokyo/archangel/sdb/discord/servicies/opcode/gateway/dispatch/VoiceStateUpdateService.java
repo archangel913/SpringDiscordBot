@@ -3,6 +3,7 @@ package tokyo.archangel.sdb.discord.servicies.opcode.gateway.dispatch;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.Code0Dto;
@@ -14,6 +15,8 @@ import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 @Slf4j
 public class VoiceStateUpdateService implements OpcodeServiceInterface {
 	private VoiceChannels channels;
+	
+	private SendMessageService sendMessageService;
 
 	public VoiceStateUpdateService(VoiceChannels channels) {
 		this.channels = channels;
@@ -29,11 +32,14 @@ public class VoiceStateUpdateService implements OpcodeServiceInterface {
 			log.warn("想定外の型のため処理を実行しません");
 			return;
 		}
+		
+		VoiceChannelInfo info = channels.getVoiceChannelInfo(sendMessageService.getSession().getId());
+		info.setSessionId(detail.getSessionId());
+		info.setUserId(detail.getUserId());
 	}
 
 	@Override
 	public void setSendSessageService(SendMessageService sendMessageService) {
-		// 使用しないので空実装
+		this.sendMessageService = sendMessageService;
 	}
-
 }

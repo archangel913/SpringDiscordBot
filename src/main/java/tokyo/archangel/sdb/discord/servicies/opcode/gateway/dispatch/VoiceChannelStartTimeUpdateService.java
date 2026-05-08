@@ -1,5 +1,8 @@
 package tokyo.archangel.sdb.discord.servicies.opcode.gateway.dispatch;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +20,8 @@ public class VoiceChannelStartTimeUpdateService implements OpcodeServiceInterfac
 	
 	private VoiceChannels channels;
 	
+	private SendMessageService sendMessageService;
+	
 	public VoiceChannelStartTimeUpdateService(VoiceChannels channels) {
 		this.channels = channels;
 	}
@@ -32,13 +37,15 @@ public class VoiceChannelStartTimeUpdateService implements OpcodeServiceInterfac
 			return;
 		}
 		
+		VoiceChannelInfo info = channels.getVoiceChannelInfo(sendMessageService.getSession().getId());
 		if(detail.getVoiceStartTime() == null) {
-			channels.removeVoiceChannelInfo(detail.getId());
+			channels.removeVoiceChannelInfo(detail.getGuildId());
 		} else {
-			channels.setVoiceChannelInfo(detail);
+			info.setChannelId(detail.getId());
+			info.setGuildId(detail.getGuildId());
+			info.setStartTime(LocalDateTime.ofEpochSecond(detail.getVoiceStartTime(), 0, ZoneOffset.ofHours(9)));
 		}
-		
-		VoiceChannelInfo info = channels.getVoiceChannelInfo(detail.getId());
+
 		if(info == null) {
 			log.trace("表示できる情報がありません");
 		} else {
@@ -48,7 +55,7 @@ public class VoiceChannelStartTimeUpdateService implements OpcodeServiceInterfac
 
 	@Override
 	public void setSendSessageService(SendMessageService sendMessageService) {
-		// 使用しないので空実装
+		this.sendMessageService = sendMessageService;
 	}
 
 }

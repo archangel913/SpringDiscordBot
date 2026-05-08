@@ -3,21 +3,20 @@ package tokyo.archangel.sdb.discord.servicies.opcode.voice;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
+import tokyo.archangel.sdb.discord.dto.voice.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatService;
 import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.OpcodeServiceInterface;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 @Service
 @Slf4j
-public class Opcode6Service implements OpcodeServiceInterface {
-	
+public class Opcode3Service implements OpcodeServiceInterface {
+
 	private HeartBeatServiceProvider heartBeatServiceProvider;
 
 	private SendMessageService sendMessageService;
 	
-	public Opcode6Service(HeartBeatServiceProvider heartBeatServiceProvider) {
+	public Opcode3Service(HeartBeatServiceProvider heartBeatServiceProvider) {
 		this.heartBeatServiceProvider = heartBeatServiceProvider;
 	}
 	@Override

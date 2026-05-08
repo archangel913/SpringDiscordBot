@@ -9,11 +9,11 @@ import tokyo.archangel.sdb.discord.enumeration.VoiceOpCode;
 
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class Code3Dto extends OpCodeSendBaseDto {
+public class Code3SendDto extends OpCodeSendBaseDto {
 	@JsonProperty("d")
-	private Code3Detail detail;
+	private Long detail;
 
-	public Code3Dto(Code3Detail detail) {
+	public Code3SendDto(Long detail) {
 		super(VoiceOpCode.HEARTBEAT);
 		this.detail = detail;
 	}

@@ -1,4 +1,4 @@
-package tokyo.archangel.sdb.discord.dto.voice.opcode.code6;
+package tokyo.archangel.sdb.discord.dto.voice.opcode.code3;
 
 import java.beans.Introspector;
 
@@ -9,23 +9,23 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 import tokyo.archangel.sdb.discord.dto.voice.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.enumeration.VoiceOpCode;
-import tokyo.archangel.sdb.discord.servicies.opcode.voice.Opcode6Service;
+import tokyo.archangel.sdb.discord.servicies.opcode.voice.Opcode3Service;
 
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class Code6Dto extends OpCodeReceiveBaseDto {
+public class Code3ReceiveDto extends OpCodeReceiveBaseDto {
 	@JsonProperty("d")
-	private Code6Detail detail;
+	private Long detail;
 
-	public Code6Dto(Code6Detail detail) {
-		super(VoiceOpCode.HEARTBEAT_ACK);
+	public Code3ReceiveDto(Long detail) {
+		super(VoiceOpCode.HEARTBEAT);
 		this.detail = detail;
 	}
-
+	
 	@JsonIgnore
 	@Override
 	public String getServiceClassName() {
-		String className = Opcode6Service.class.getSimpleName();
+		String className = Opcode3Service.class.getSimpleName();
 		return Introspector.decapitalize(className);
 	}
 }

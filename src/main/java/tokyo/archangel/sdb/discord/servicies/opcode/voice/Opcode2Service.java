@@ -3,8 +3,7 @@ package tokyo.archangel.sdb.discord.servicies.opcode.voice;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.OpcodeServiceInterface;
+import tokyo.archangel.sdb.discord.dto.voice.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 @Service
@@ -14,7 +13,6 @@ public class Opcode2Service implements OpcodeServiceInterface {
 	@Override
 	public void exec(OpCodeReceiveBaseDto dto) {
 		// TODO 自動生成されたメソッド・スタブ
-
 	}
 
 	@Override

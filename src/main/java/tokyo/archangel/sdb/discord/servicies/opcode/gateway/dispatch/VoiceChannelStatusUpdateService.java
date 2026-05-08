@@ -16,6 +16,8 @@ import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 public class VoiceChannelStatusUpdateService implements OpcodeServiceInterface {
 	private VoiceChannels channels;
 
+	private SendMessageService sendMessageService;
+
 	public VoiceChannelStatusUpdateService(VoiceChannels channels) {
 		this.channels = channels;
 	}
@@ -31,14 +33,16 @@ public class VoiceChannelStatusUpdateService implements OpcodeServiceInterface {
 			return;
 		}
 
+		VoiceChannelInfo info = channels.getVoiceChannelInfo(sendMessageService.getSession().getId());
 		if (detail.getStatus() == null) {
-			channels.removeVoiceChannelInfo(detail.getId());
+			channels.removeVoiceChannelInfo(detail.getGuildId());
 		} else {
-			channels.setVoiceChannelInfo(detail);
+			info.setChannelId(detail.getId());
+			info.setGuildId(detail.getGuildId());
+			info.setStatus(detail.getStatus());
 		}
-		
-		VoiceChannelInfo info = channels.getVoiceChannelInfo(detail.getId());
-		if(info == null) {
+
+		if (info == null) {
 			log.trace("表示できる情報がありません");
 		} else {
 			log.trace(info.toString());
@@ -47,7 +51,7 @@ public class VoiceChannelStatusUpdateService implements OpcodeServiceInterface {
 
 	@Override
 	public void setSendSessageService(SendMessageService sendMessageService) {
-		// 使用しないので空実装
+		this.sendMessageService = sendMessageService;
 	}
 
 }

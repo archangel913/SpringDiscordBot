@@ -10,7 +10,6 @@ import tokyo.archangel.sdb.ApplicationProperties;
 import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.ready.ReadyDetail;
-import tokyo.archangel.sdb.discord.dto.gateway.opcode.code1.Code1SendDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code10.Code10Dto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code2.Code2Detail;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code2.Code2Dto;
@@ -74,7 +73,6 @@ public class Opcode10Service implements OpcodeServiceInterface {
 		HeartBeatService heartBeatService = heartBeatServiceProvider
 				.getHeartBeatService(sendMessageService.getSession());
 		heartBeatService.setSendMessageService(sendMessageService);
-		heartBeatService.setSendOpcode(Code1SendDto.class.getName());
 		heartBeatService.exec(interval);
 	}
 

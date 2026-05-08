@@ -33,17 +33,6 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		session.setTextMessageSizeLimit(properties.getWebsocketMessageSizeLimit());
-		
-		// TODO 接続時にそのまま認証まで完了させる
-		// ここだとchannelIdを設定できない
-
-		// セッション更新
-		// メッセージ送信スレッド起動
-		//SendMessageService sendMessageService = sendMessageServiceProvider.generateSendMessageService(session, 0);
-		//sendMessageService.exec();
-
-		// 認証用のOpCode0を送信する
-
 	}
 
 	@Override

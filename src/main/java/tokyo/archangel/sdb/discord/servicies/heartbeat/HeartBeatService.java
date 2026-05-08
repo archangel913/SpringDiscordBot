@@ -1,13 +1,15 @@
 package tokyo.archangel.sdb.discord.servicies.heartbeat;
 
+import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 public interface HeartBeatService {
 	/**
-	 * 送信するopcodeを設定する
+	 * VoiceChannelInfoを設定する<br>
+	 * nullの場合、ゲートウェイ扱いとなる
 	 * @param opcodeClassName
 	 */
-	public void setSendOpcode(String opcodeClassName);
+	public void setVoiceChannelInfo(VoiceChannelInfo voiceChannelInfo);
 	
 	/**
 	 * メッセージサービスを設定する

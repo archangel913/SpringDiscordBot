@@ -15,6 +15,16 @@ public class VoiceChannelInfo {
 	private String channelId;
 
 	/**
+	 * ユーザーID
+	 */
+	private String userId;
+
+	/**
+	 * セッションID
+	 */
+	private String sessionId;
+
+	/**
 	 * ギルドID
 	 */
 	private String guildId;
@@ -29,6 +39,11 @@ public class VoiceChannelInfo {
 	 * JSTです（+9時間）
 	 */
 	private LocalDateTime startTime;
+
+	/**
+	 * シーケンス
+	 */
+	private long seq = -1;
 
 	@Override
 	public String toString() {
