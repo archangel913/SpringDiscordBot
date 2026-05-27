@@ -7,15 +7,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.EqualsAndHashCode;
 import lombok.Value;
-import tokyo.archangel.sdb.discord.dto.OpecodeServiceInitializeable;
+import tokyo.archangel.sdb.discord.dto.TargetServiceNameObtainable;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.enumeration.DispatchEvent;
 import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.Opcode1Service;
+import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcode1Service;
 
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class Code1ReceiveDto extends OpCodeReceiveBaseDto implements OpecodeServiceInitializeable {
+public class Code1ReceiveDto extends OpCodeReceiveBaseDto implements TargetServiceNameObtainable {
 	@JsonProperty("d")
 	private Long d;
 
@@ -27,7 +27,7 @@ public class Code1ReceiveDto extends OpCodeReceiveBaseDto implements OpecodeServ
 	@JsonIgnore
 	@Override
 	public String getServiceClassName() {
-		String className = Opcode1Service.class.getSimpleName();
+		String className = GatewayOpcode1Service.class.getSimpleName();
 		return Introspector.decapitalize(className);
 	}
 }

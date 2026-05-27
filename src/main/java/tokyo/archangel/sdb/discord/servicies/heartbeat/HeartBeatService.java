@@ -36,5 +36,5 @@ public interface HeartBeatService {
 	/**
 	 * ハートビートを終了する
 	 */
-	public void stopHeartBeat();
+	public void dispose();
 }

@@ -59,7 +59,7 @@ public class HeartBeatServiceImpl implements HeartBeatService {
 	@Async
 	@Override
 	public synchronized void exec(int interval) {
-		if(status == ServiceThreadStatus.ACTIVE) {
+		if (status == ServiceThreadStatus.ACTIVE) {
 			log.debug("ハートビートスレッドがすでに起動しています");
 			return;
 		}
@@ -84,7 +84,7 @@ public class HeartBeatServiceImpl implements HeartBeatService {
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		} finally {
-			HeartBeatCheckService.stopHeartBeatCheak();
+			HeartBeatCheckService.dispose();
 		}
 	}
 
@@ -99,8 +99,10 @@ public class HeartBeatServiceImpl implements HeartBeatService {
 		sendMessageService.sendMessage(json);
 	}
 
+	@PreDestroy
 	@Override
-	public void stopHeartBeat() {
+	public void dispose() {
+		HeartBeatCheckService.dispose();
 		if (status != ServiceThreadStatus.ACTIVE) {
 			return;
 		}
@@ -111,11 +113,6 @@ public class HeartBeatServiceImpl implements HeartBeatService {
 		sendMessageService.dispose();
 		log.debug("ハートビートスレッドが完了しました");
 		status = ServiceThreadStatus.TERMINATED;
-	}
-
-	@PreDestroy
-	public void dispose() {
-		HeartBeatCheckService.stopHeartBeatCheak();
 	}
 
 	private String generateJson() {

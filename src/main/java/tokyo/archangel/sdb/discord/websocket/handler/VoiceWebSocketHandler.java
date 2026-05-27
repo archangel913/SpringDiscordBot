@@ -2,11 +2,13 @@ package tokyo.archangel.sdb.discord.websocket.handler;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.ApplicationProperties;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
@@ -22,6 +24,8 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 	private ApplicationProperties properties;
 
 	private SendMessageServiceProvider sendMessageServiceProvider;
+	
+	private boolean isDisconennct = false;
 
 	public VoiceWebSocketHandler(VoiceService discordVoiceService, ApplicationProperties properties,
 			SendMessageServiceProvider sendMessageServiceProvider) {
@@ -39,57 +43,44 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 	public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		// テキストを受信したときに呼ばれるメソッド
 		String payload = message.getPayload();
-		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session, 0);
+		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session);
 		discordVoiceService.receive(payload, service);
+	}
+	
+	@Override
+	protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
+	    SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session);
+	    discordVoiceService.recieve(message.getPayload(), service);
 	}
 
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-		// TODO 1006 対策
-		// Unexpected Status of SSLEngineResult after an unwrap() operation
-
 		// 切断時に呼ばれるメソッド
 		log.debug("voiceWebSocket: 切断されました");
 		log.debug(String.valueOf(status.getCode()));
 		log.debug(status.getReason());
+		
+		// スレッドの終了処理が実行されているとは限らないので
+		// 再度終了処理を呼んでおく
+		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session);
+		discordVoiceService.dispose(service);
 
-		/*
-		// シャットダウン中なら後続処理を行わない
-		if (isShuttingDown) {
+		// 切断フラグが上がっていれば後続処理を行わない
+		if (isDisconennct) {
 			return;
 		}
+		
+		// TODO ユーザーの操作で切られたりしたときは再接続を行わない
+		// ステータスコードで判断
 
-		// ステータスコードによって再接続処理を切り替える
-		GatewayWebsocketCode code = GatewayWebsocketCode.getGatewayWebsocketCode(status.getCode());
-		if (code != GatewayWebsocketCode.NORMAL_CLOSURE && code != GatewayWebsocketCode.GOING_AWAY) {
-			// 異常終了だった場合
-			int failCount = gatewayInfo.getConnectionFailCount() + 1;
-			if (failCount > 5) {
-				// 既定回数以上失敗したらアプリケーションを落とす
-				log.error("接続に5回連続で失敗しました。アプリケーションを終了します。");
-				SpringApplication.exit(context, () -> 1);
-				return;
-			}
-			gatewayInfo.setConnectionFailCount(failCount);
-
-			// 再接続不可の場合、認証からやり直す
-			if (!code.canReconnect()) {
-				gatewayInfo.setReconnectMode(ReconnectMode.HARD);
-			}
-		}
-
-		// 再接続URL取得
-		String connectUrl;
-		if (gatewayInfo.getReconnectMode() == ReconnectMode.NORMAL) {
-			connectUrl = gatewayInfo.getReadyDetail().getResumeGatewayUrl();
-		} else {
-			connectUrl = api.getGatewayUrl();
-		}
-		connectUrl += "/?v=10&encoding=json";
-
-		// ディスコード再接続
-		voiceConnectionService.connect(connectUrl);
-		log.info("再接続が完了しました");
-		*/
+		// 再接続処理
+		
+		// TODO 再開に失敗した場合、再度新規接続を行う必要がある
+		discordVoiceService.reconnect(service);
+	}
+	
+	@PreDestroy
+	public void onShutdown() {
+		this.isDisconennct = true;
 	}
 }

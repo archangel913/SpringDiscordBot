@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.enumeration.DispatchEvent;
 import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.Opcode11Service;
+import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcode11Service;
 
 
 @EqualsAndHashCode(callSuper = true)
@@ -20,7 +20,7 @@ public class Code11Dto extends OpCodeReceiveBaseDto{
 	@JsonIgnore
 	@Override
 	public String getServiceClassName(){
-		String className = Opcode11Service.class.getSimpleName();
+		String className = GatewayOpcode11Service.class.getSimpleName();
 		return Introspector.decapitalize(className);
 	}
 }

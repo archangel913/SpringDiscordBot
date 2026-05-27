@@ -10,7 +10,7 @@ import lombok.Value;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.enumeration.DispatchEvent;
 import tokyo.archangel.sdb.discord.enumeration.GatewayOpCode;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.Opcode7Service;
+import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcode7Service;
 
 
 @Value
@@ -27,7 +27,7 @@ public class Code7Dto extends OpCodeReceiveBaseDto{
 	@JsonIgnore
 	@Override
 	public String getServiceClassName(){
-		String className = Opcode7Service.class.getSimpleName();
+		String className = GatewayOpcode7Service.class.getSimpleName();
 		return Introspector.decapitalize(className);
 	}
 }

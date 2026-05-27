@@ -7,7 +7,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import jakarta.annotation.PreDestroy;
@@ -25,7 +27,7 @@ import tokyo.archangel.sdb.discord.enumeration.ServiceThreadStatus;
 public class SendMessageServiceImpl implements SendMessageService {
 	private ApplicationProperties properties;
 
-	private Queue<String> messageQueue = new ConcurrentLinkedQueue<>();
+	private Queue<WebSocketMessage<?>> messageQueue = new ConcurrentLinkedQueue<>();
 
 	private WebSocketSession session;
 
@@ -33,17 +35,23 @@ public class SendMessageServiceImpl implements SendMessageService {
 	
 	private Thread currentThread;
 	
-	private long channelId;
+	private String channelId;
+	
+	private int ssrc;
 
-	public SendMessageServiceImpl(ApplicationProperties properties, WebSocketSession session, Long channelId) {
+	public SendMessageServiceImpl(ApplicationProperties properties, WebSocketSession session) {
 		this.properties = properties;
 		this.session = session;
-		this.channelId = channelId;
 	}
 
 	@Override
-	public long getChannelId() {
+	public String getChannelId() {
 		return channelId;
+	}
+	
+	@Override
+	public int getSsrc() {
+		return ssrc;
 	}
 
 	@Override
@@ -53,7 +61,13 @@ public class SendMessageServiceImpl implements SendMessageService {
 
 	@Override
 	public void sendMessage(String message) {
-		messageQueue.add(message);
+		messageQueue.add(new TextMessage(message));
+	}
+	
+	@Override
+	public void sendMessage(byte[] message) {
+		messageQueue.add(new BinaryMessage(message));
+		
 	}
 
 	@Async
@@ -74,11 +88,11 @@ public class SendMessageServiceImpl implements SendMessageService {
 
 				// キューに送信内容があれば送信する				
 				if (!messageQueue.isEmpty()) {
-					String message = messageQueue.peek();
+					WebSocketMessage<?> message = messageQueue.peek();
 					if (session != null && session.isOpen()) {
 						try {
-							session.sendMessage(new TextMessage(message));
-							log.trace("送信内容：" + message);
+							session.sendMessage(message);
+							log.trace("送信内容：" + message.getPayload());
 							messageQueue.remove();
 						} catch (IOException e) {
 							// 送信に失敗しているため再送する
@@ -101,9 +115,20 @@ public class SendMessageServiceImpl implements SendMessageService {
 			status = ServiceThreadStatus.TERMINATED;
 		}
 	}
+	
+	public void setChannelId(String channelId) {
+		this.channelId = channelId;
+	}
+	
+	public void setSsrc(int ssrc) {
+		this.ssrc = ssrc;
+	}
 
 	@PreDestroy
 	public void dispose() {
+		if(status != ServiceThreadStatus.ACTIVE) {
+			return;
+		}
 		status = ServiceThreadStatus.TERMINATING;
 		currentThread.interrupt();
 	}

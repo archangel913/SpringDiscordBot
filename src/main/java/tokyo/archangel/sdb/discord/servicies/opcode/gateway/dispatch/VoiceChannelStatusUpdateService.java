@@ -8,12 +8,12 @@ import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.Code0Dto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.voicechannelstatusupdate.VoiceChannelStatusUpdateDetail;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.OpcodeServiceInterface;
+import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcodeServiceInterface;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 @Service
 @Slf4j
-public class VoiceChannelStatusUpdateService implements OpcodeServiceInterface {
+public class VoiceChannelStatusUpdateService implements GatewayOpcodeServiceInterface {
 	private VoiceChannels channels;
 
 	private SendMessageService sendMessageService;
@@ -33,9 +33,9 @@ public class VoiceChannelStatusUpdateService implements OpcodeServiceInterface {
 			return;
 		}
 
-		VoiceChannelInfo info = channels.getVoiceChannelInfo(sendMessageService.getSession().getId());
+		VoiceChannelInfo info = channels.generateInfo(detail.getId());
 		if (detail.getStatus() == null) {
-			channels.removeVoiceChannelInfo(detail.getGuildId());
+			channels.removeInfoBySessionId(detail.getGuildId());
 		} else {
 			info.setChannelId(detail.getId());
 			info.setGuildId(detail.getGuildId());

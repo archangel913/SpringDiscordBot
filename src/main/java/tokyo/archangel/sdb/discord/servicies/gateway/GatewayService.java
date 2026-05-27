@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcodeServiceFactory;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.OpcodeServiceInterface;
+import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcodeServiceInterface;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
@@ -55,7 +55,7 @@ public class GatewayService {
 	}
 
 	public void receive(OpCodeReceiveBaseDto baseDto, SendMessageService sendMessageService) {
-		OpcodeServiceInterface service = opcodeServiceFactory.create(baseDto, sendMessageService);
+		GatewayOpcodeServiceInterface service = opcodeServiceFactory.create(baseDto, sendMessageService);
 		if (service == null) {
 			log.warn("サービスの取得に失敗しました。");
 			return;

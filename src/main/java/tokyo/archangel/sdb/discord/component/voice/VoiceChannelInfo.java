@@ -1,6 +1,10 @@
 package tokyo.archangel.sdb.discord.component.voice;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Component;
 
@@ -9,6 +13,16 @@ import lombok.Data;
 @Data
 @Component
 public class VoiceChannelInfo {
+	/**
+	 * 音声websoketの接続先
+	 */
+	private String endpoint;
+	
+	/**
+	 * ハートビート送信の間隔
+	 */
+	private int heartBeatInterval;
+	
 	/**
 	 * チャンネルID
 	 */
@@ -30,6 +44,11 @@ public class VoiceChannelInfo {
 	private String guildId;
 
 	/**
+	 * チャンネルに参加しているユーザー一覧
+	 */
+	private List<String> joinedUserIds = Collections.synchronizedList(new ArrayList<>());
+
+	/**
 	 * ステータス
 	 */
 	private String status;
@@ -41,16 +60,37 @@ public class VoiceChannelInfo {
 	private LocalDateTime startTime;
 
 	/**
+	 * ssrc
+	 */
+	private Integer ssrc;
+	
+	/**
+	 * 音声接続に使用するトークン
+	 */
+	private String token;
+
+	/**
+	 * 音声接続情報
+	 */
+	private VoiceConnectionInfo info;
+
+	/**
+	 * websocketのGUID
+	 */
+	private String websocketGuid;
+
+	/**
 	 * シーケンス
 	 */
 	private long seq = -1;
 
-	@Override
-	public String toString() {
-		return "\n"
-				+ "チャンネルID: " + channelId + "\n"
-				+ "ギルドID: " + guildId + "\n"
-				+ "ステータス: " + status + "\n"
-				+ "チャンネル開始時刻: " + startTime + "\n";
-	}
+	/**
+	 * 音声送信準備が整ったか
+	 */
+	private CompletableFuture<Void> readyFuture = new CompletableFuture<Void>();
+	
+	/**
+	 * 再接続を何回したか
+	 */
+	private int connectionFailCount = 0;
 }

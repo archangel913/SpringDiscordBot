@@ -6,10 +6,16 @@ public interface SendMessageService {
 	
 	/**
 	 * チャンネルIDを取得する
-	 * -1の場合はゲートウェイを指す
+	 * "gateway"の場合はゲートウェイを指す
 	 * @return
 	 */
-	public long getChannelId();
+	public String getChannelId();
+	
+	/**
+	 * SSRC (Synchronization Source)を取得する
+	 * @return
+	 */
+	public int getSsrc();
 	
 	/**
 	 * ウェブソケットのセッションを取得する
@@ -23,6 +29,13 @@ public interface SendMessageService {
 	 * @param message
 	 */
 	public void sendMessage(String message);
+	
+	/**
+	 * メッセージを送信する<br>
+	 * 内部的には送信待ちキューに追加する
+	 * @param message
+	 */
+	public void sendMessage(byte[] message);
 
 	/**
 	 * メッセージ送信メソッド<br>

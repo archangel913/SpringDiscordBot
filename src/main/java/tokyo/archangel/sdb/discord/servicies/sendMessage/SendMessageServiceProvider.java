@@ -34,10 +34,10 @@ public class SendMessageServiceProvider {
 	 * @param session
 	 * @return
 	 */
-	public SendMessageService generateSendMessageService(WebSocketSession session, long channelId) {
+	public SendMessageService generateSendMessageService(WebSocketSession session) {
 		return sendMessageServices.computeIfAbsent(session.getId(), id -> {
 			// SpringのコンテキストからBeanを取得（この時DIも行われる）
-			return serviceProvider.getObject(properties, session, channelId);
+			return serviceProvider.getObject(properties, session);
 		});
 	}
 
@@ -47,13 +47,60 @@ public class SendMessageServiceProvider {
 	 * @param channelId
 	 * @return
 	 */
-	public SendMessageService getServiceByChannelId(long channelId) {
+	public SendMessageService getServiceByChannelId(String channelId) {
 		for (Entry<String, SendMessageServiceImpl> service : sendMessageServices.entrySet()) {
-			if (service.getValue().getChannelId() == channelId) {
+			if (service.getValue().getChannelId().equals(channelId)) {
 				return service.getValue();
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * ssrcからサービスを取得する<br>
+	 * 一致するサービスが無かった場合はnullを返す
+	 * @param channelId
+	 * @return
+	 */
+	public SendMessageService getServiceBySsrc(int ssrc) {
+		for (Entry<String, SendMessageServiceImpl> service : sendMessageServices.entrySet()) {
+			if (service.getValue().getSsrc() == ssrc) {
+				return service.getValue();
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * 特定のsessionに対して、チャンネルIDを設定する
+	 * @param session
+	 * @param channelId
+	 * @return
+	 */
+	public boolean setChannelId(WebSocketSession session, String channelId) {
+		SendMessageServiceImpl service = sendMessageServices.get(session.getId());
+		if(service == null) {
+			return false;
+		}
+		
+		service.setChannelId(channelId);
+		return true;
+	}
+	
+	/**
+	 * 特定のsessionに対して、チャンネルIDを設定する
+	 * @param session
+	 * @param channelId
+	 * @return
+	 */
+	public boolean setSsrc(WebSocketSession session, int ssrc) {
+		SendMessageServiceImpl service = sendMessageServices.get(session.getId());
+		if(service == null) {
+			return false;
+		}
+		
+		service.setSsrc(ssrc);
+		return true;
 	}
 
 	/**

@@ -28,7 +28,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Service
 @Slf4j
-public class Opcode10Service implements OpcodeServiceInterface {
+public class GatewayOpcode10Service implements GatewayOpcodeServiceInterface {
 	private HeartBeatServiceProvider heartBeatServiceProvider;
 
 	private SendMessageService sendMessageService;
@@ -41,7 +41,7 @@ public class Opcode10Service implements OpcodeServiceInterface {
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	public Opcode10Service(HeartBeatServiceProvider heartBeatServiceProvider, GatewayInfo gatewayInfo,
+	public GatewayOpcode10Service(HeartBeatServiceProvider heartBeatServiceProvider, GatewayInfo gatewayInfo,
 			Environment environment, ApplicationProperties properties) {
 		this.heartBeatServiceProvider = heartBeatServiceProvider;
 		this.gatewayInfo = gatewayInfo;

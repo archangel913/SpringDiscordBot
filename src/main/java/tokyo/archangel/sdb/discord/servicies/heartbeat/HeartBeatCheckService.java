@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
@@ -23,7 +24,7 @@ import tokyo.archangel.sdb.discord.enumeration.ServiceThreadStatus;
 public class HeartBeatCheckService {
 	private GatewayInfo gatewayInfo;
 
-	private HeartBeatServiceImpl heartBeatService;
+	private HeartBeatService heartBeatService;
 
 	private ServiceThreadStatus status;
 
@@ -84,7 +85,7 @@ public class HeartBeatCheckService {
 			// 実行されているハートビートを停止させる
 			log.warn("ハートビートスレッドを停止します");
 			if (heartBeatService != null) {
-				heartBeatService.stopHeartBeat();
+				heartBeatService.dispose();
 			} else {
 				log.warn("ハートビートサービスがnullです。サービスの停止を行いません。");
 			}
@@ -94,7 +95,11 @@ public class HeartBeatCheckService {
 		}
 	}
 
-	public void stopHeartBeatCheak() {
+	@PreDestroy
+	public void dispose() {
+		if(status != ServiceThreadStatus.ACTIVE) {
+			return;
+		}
 		status = ServiceThreadStatus.TERMINATING;
 		currentThread.interrupt();
 	}

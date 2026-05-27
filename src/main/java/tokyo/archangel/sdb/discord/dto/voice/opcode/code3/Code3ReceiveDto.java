@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 import tokyo.archangel.sdb.discord.dto.voice.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.enumeration.VoiceOpCode;
-import tokyo.archangel.sdb.discord.servicies.opcode.voice.Opcode3Service;
+import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcode3Service;
 
 @Value
 @EqualsAndHashCode(callSuper = true)
@@ -25,7 +25,7 @@ public class Code3ReceiveDto extends OpCodeReceiveBaseDto {
 	@JsonIgnore
 	@Override
 	public String getServiceClassName() {
-		String className = Opcode3Service.class.getSimpleName();
+		String className = VoiceOpcode3Service.class.getSimpleName();
 		return Introspector.decapitalize(className);
 	}
 }

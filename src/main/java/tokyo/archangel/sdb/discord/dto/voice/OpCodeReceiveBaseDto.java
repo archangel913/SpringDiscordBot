@@ -7,9 +7,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import tokyo.archangel.sdb.discord.dto.NotImplementCodeDto;
-import tokyo.archangel.sdb.discord.dto.OpecodeServiceInitializeable;
+import tokyo.archangel.sdb.discord.dto.TargetServiceNameObtainable;
+import tokyo.archangel.sdb.discord.dto.voice.opcode.code11.Code11Dto;
+import tokyo.archangel.sdb.discord.dto.voice.opcode.code13.Code13Dto;
 import tokyo.archangel.sdb.discord.dto.voice.opcode.code2.Code2Dto;
+import tokyo.archangel.sdb.discord.dto.voice.opcode.code22.Code22Dto;
 import tokyo.archangel.sdb.discord.dto.voice.opcode.code3.Code3ReceiveDto;
+import tokyo.archangel.sdb.discord.dto.voice.opcode.code4.Code4Dto;
 import tokyo.archangel.sdb.discord.dto.voice.opcode.code8.Code8Dto;
 import tokyo.archangel.sdb.discord.enumeration.VoiceOpCode;
 
@@ -17,11 +21,15 @@ import tokyo.archangel.sdb.discord.enumeration.VoiceOpCode;
 @JsonSubTypes({
 		@JsonSubTypes.Type(value = Code2Dto.class, name = "2"),
 		@JsonSubTypes.Type(value = Code3ReceiveDto.class, name = "3"),
+		@JsonSubTypes.Type(value = Code4Dto.class, name = "4"),
 		@JsonSubTypes.Type(value = Code8Dto.class, name = "8"),
+		@JsonSubTypes.Type(value = Code11Dto.class, name = "11"),
+		@JsonSubTypes.Type(value = Code13Dto.class, name = "13"),
+		@JsonSubTypes.Type(value = Code22Dto.class, name = "22"),
 })
 @Value
 @NonFinal
-public abstract class OpCodeReceiveBaseDto implements OpecodeServiceInitializeable{
+public abstract class OpCodeReceiveBaseDto implements TargetServiceNameObtainable{
 	@JsonProperty("op")
 	private Integer opCode;
 

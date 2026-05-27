@@ -1,12 +1,12 @@
-package tokyo.archangel.sdb.discord.servicies.opcode.voice;
+package tokyo.archangel.sdb.discord.servicies.opcode.gateway;
 
-import tokyo.archangel.sdb.discord.dto.voice.OpCodeReceiveBaseDto;
+import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 /**
  * opcodeを受け取った際の処理を担当するインターフェース
  */
-public interface OpcodeServiceInterface {
+public interface GatewayOpcodeServiceInterface {
 	/**
 	 * サービスの処理を実行
 	 * @param dto

@@ -1,9 +1,11 @@
 package tokyo.archangel.sdb.discord.enumeration;
 
 public enum ServiceThreadStatus {
-	ACTIVE(1),
-	TERMINATING(2),
-	TERMINATED(3);
+	INITIALIZING(1),
+	INITIALIZED(2),
+	ACTIVE(3),
+	TERMINATING(4),
+	TERMINATED(5);
 	
 	private final int statusNumber;
 	

@@ -10,13 +10,13 @@ import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 @Service
 @Slf4j
-public class Opcode3Service implements OpcodeServiceInterface {
+public class VoiceOpcode3Service implements VoiceOpcodeServiceInterface {
 
 	private HeartBeatServiceProvider heartBeatServiceProvider;
 
 	private SendMessageService sendMessageService;
 	
-	public Opcode3Service(HeartBeatServiceProvider heartBeatServiceProvider) {
+	public VoiceOpcode3Service(HeartBeatServiceProvider heartBeatServiceProvider) {
 		this.heartBeatServiceProvider = heartBeatServiceProvider;
 	}
 	@Override

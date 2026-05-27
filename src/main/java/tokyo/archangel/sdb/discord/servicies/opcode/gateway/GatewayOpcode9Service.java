@@ -16,14 +16,14 @@ import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
  */
 @Service
 @Slf4j
-public class Opcode9Service implements OpcodeServiceInterface {
+public class GatewayOpcode9Service implements GatewayOpcodeServiceInterface {
 	private HeartBeatServiceProvider heartBeatServiceProvider;
 
 	private SendMessageService sendMessageService;
 
 	private GatewayInfo gatewayInfo;
 
-	public Opcode9Service(HeartBeatServiceProvider heartBeatServiceProvider, GatewayInfo gatewayInfo) {
+	public GatewayOpcode9Service(HeartBeatServiceProvider heartBeatServiceProvider, GatewayInfo gatewayInfo) {
 		this.heartBeatServiceProvider = heartBeatServiceProvider;
 		this.gatewayInfo = gatewayInfo;
 	}
@@ -51,7 +51,7 @@ public class Opcode9Service implements OpcodeServiceInterface {
 		}
 
 		HeartBeatService service = heartBeatServiceProvider.getHeartBeatService(sendMessageService.getSession());
-		service.stopHeartBeat();
+		service.dispose();
 		 heartBeatServiceProvider.removeService(sendMessageService.getSession());
 	}
 

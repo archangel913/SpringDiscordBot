@@ -16,14 +16,14 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Service
 @Slf4j
-public class Opcode1Service implements OpcodeServiceInterface {
+public class GatewayOpcode1Service implements GatewayOpcodeServiceInterface {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	private HeartBeatServiceProvider heartBeatServiceProvider;
 
 	private SendMessageService sendMessageService;
 
-	public Opcode1Service(HeartBeatServiceProvider heartBeatServiceProvider) {
+	public GatewayOpcode1Service(HeartBeatServiceProvider heartBeatServiceProvider) {
 		this.heartBeatServiceProvider = heartBeatServiceProvider;
 	}
 

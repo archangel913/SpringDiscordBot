@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import tokyo.archangel.sdb.discord.dto.NotImplementCodeDto;
-import tokyo.archangel.sdb.discord.dto.OpecodeServiceInitializeable;
+import tokyo.archangel.sdb.discord.dto.TargetServiceNameObtainable;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.ready.ReadyDetail;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.voicechannelstarttimeupdate.VoiceChannelStartTimeUpdateDetail;
@@ -44,7 +44,7 @@ public class Code0Dto extends OpCodeReceiveBaseDto {
 	@JsonIgnore
 	@Override
 	public String getServiceClassName() {
-		return ((OpecodeServiceInitializeable) detail).getServiceClassName();
+		return ((TargetServiceNameObtainable) detail).getServiceClassName();
 	}
 
 }

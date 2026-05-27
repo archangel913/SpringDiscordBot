@@ -24,6 +24,8 @@ import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvi
 @Component
 @Slf4j
 public class GatewayWebSocketHandler extends TextWebSocketHandler {
+	private static final String GATEWAY = "gateway";
+	
 	private GatewayService discordMainService;
 
 	private DiscordApi api;
@@ -56,7 +58,8 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		// 接続時に呼ばれるメソッド
 		session.setTextMessageSizeLimit(properties.getWebsocketMessageSizeLimit());
-		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session, -1);
+		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session);
+		sendMessageServiceProvider.setChannelId(session, GATEWAY);
 		service.exec();
 	}
 
@@ -64,7 +67,7 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 	public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		// テキストを受信したときに呼ばれるメソッド
 		String payload = message.getPayload();
-		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session, -1);
+		SendMessageService service = sendMessageServiceProvider.getServiceByChannelId(GATEWAY);
 		discordMainService.receive(payload, service);
 	}
 

@@ -9,9 +9,9 @@ import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
 @Component
 public class VoiceOpcodeServiceFactory {
-	private Map<String, OpcodeServiceInterface> voiceOpCodeServices;
+	private Map<String, VoiceOpcodeServiceInterface> voiceOpCodeServices;
 	
-	public VoiceOpcodeServiceFactory(Map<String, OpcodeServiceInterface> voiceOpCodeServices) {
+	public VoiceOpcodeServiceFactory(Map<String, VoiceOpcodeServiceInterface> voiceOpCodeServices) {
 		this.voiceOpCodeServices = voiceOpCodeServices;
 	}
 
@@ -21,8 +21,8 @@ public class VoiceOpcodeServiceFactory {
 	 * @param session
 	 * @return
 	 */
-	public OpcodeServiceInterface create(OpCodeReceiveBaseDto baseDto, SendMessageService sendMessageService) {
-		OpcodeServiceInterface service = voiceOpCodeServices.get(baseDto.getServiceClassName());
+	public VoiceOpcodeServiceInterface create(OpCodeReceiveBaseDto baseDto, SendMessageService sendMessageService) {
+		VoiceOpcodeServiceInterface service = voiceOpCodeServices.get(baseDto.getServiceClassName());
 		service.setSendSessageService(sendMessageService);
 		return service;
 	}
