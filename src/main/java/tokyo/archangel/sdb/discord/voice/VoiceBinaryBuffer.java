@@ -3,8 +3,11 @@ package tokyo.archangel.sdb.discord.voice;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @Scope("prototype")
+@Slf4j
 public class VoiceBinaryBuffer {
 
 	private static final int OPUS_FRAME_LENGTH = 3840;

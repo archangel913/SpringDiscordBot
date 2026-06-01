@@ -6,6 +6,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
  * 現在aead_aes256_gcm_rtpsizeのみ対応
  */
 @Service
+@Scope("prototype")
 public class TransportCryptServiceImpl implements TransportCryptService {
 	// WebSocket(OPCODE 4等)で取得した32バイトの鍵
 	private byte[] secretKey = null;

@@ -33,6 +33,10 @@ public class VoiceStateUpdateService implements GatewayOpcodeServiceInterface {
 			return;
 		}
 		
+		if(detail.getChannelId() == null) {
+			return;
+		}
+		
 		VoiceChannelInfo info = channels.generateInfo(detail.getChannelId());
 		info.setChannelId(detail.getChannelId());
 		info.setGuildId(detail.getGuildId());

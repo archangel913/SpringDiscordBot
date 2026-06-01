@@ -3,6 +3,7 @@ package tokyo.archangel.sdb.discord.voice;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code4.Code4Detail;
@@ -17,6 +18,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Service
 @Scope("prototype")
+@Slf4j
 public class VoiceSenderImpl implements VoiceSender {
 	private SendMessageServiceProvider sendMessageServiceProvider;
 
@@ -30,6 +32,8 @@ public class VoiceSenderImpl implements VoiceSender {
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
+	private final static String GATEWAY = "gateway";
+
 	public VoiceSenderImpl(SendMessageServiceProvider sendMessageServiceProvider,
 			VoiceChannels voiceChannels,
 			VoiceBinaryBuffer binaryBuffer,
@@ -41,18 +45,16 @@ public class VoiceSenderImpl implements VoiceSender {
 	}
 
 	@Override
-	public void connectAsync(String guildId, String channelId, boolean selfMute, boolean selfDeaf) {
+	public void connect(String guildId, String channelId, boolean selfMute,
+			boolean selfDeaf) {
 		voiceInfo = voiceChannels.generateInfo(channelId);
 
-		SendMessageService messageService = sendMessageServiceProvider.getServiceByChannelId("gateway");
+		SendMessageService messageService = sendMessageServiceProvider.getServiceByChannelId(GATEWAY);
 		Code4Dto dto = new Code4Dto(new Code4Detail(guildId, channelId, selfMute, selfDeaf));
 		String json = objectMapper.writeValueAsString(dto);
 		messageService.sendMessage(json);
 
 		// 音声が送信可能になるまで待機
-		// タイムアウト10秒
-		// voiceInfo.getReadyFuture().orTimeout(10, TimeUnit.SECONDS).join();
-		
 		voiceInfo.getReadyFuture().join();
 
 		// 送信ループ実行
@@ -61,13 +63,37 @@ public class VoiceSenderImpl implements VoiceSender {
 	}
 
 	@Override
-	public void disconnectAsync() {
-		// TODO 切断処理実装
+	public void disconnect() {
+		// VoiceChannelInfoに切断フラグを持たせる
+		if (voiceInfo == null) {
+			log.warn("音声情報の取得に失敗しました。音声が接続されているか確認してください。");
+			return;
+		}
+		voiceInfo.setDisconnect(true);
+
+		sendThread.stop();
+
+		// UDP切断周りの処理はVoiceServiceに集約させる
+		SendMessageService messageService = sendMessageServiceProvider.getServiceByChannelId(GATEWAY);
+		Code4Dto dto = new Code4Dto(new Code4Detail(voiceInfo.getGuildId(), null, false, false));
+		String json = objectMapper.writeValueAsString(dto);
+		messageService.sendMessage(json);
 	}
 
 	@Override
-	public void sendAsync(byte[] data) throws InterruptedException {
+	public void send(byte[] data) throws InterruptedException {
 		// 実質このメソッドはバッファへバイナリを格納するだけのお仕事
 		binaryBuffer.add(data);
 	}
+	
+	@Override
+	public void pause() {
+		sendThread.pause();
+	}
+	
+	@Override
+	public void resume() {
+		sendThread.resume();
+	}
+
 }

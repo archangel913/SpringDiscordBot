@@ -33,7 +33,7 @@ public class VoiceChannels {
 	 * ボイスチャンネルの情報を削除します
 	 * @param channelId
 	 */
-	public void removeInfoBySessionId(String channelId) {
+	public void removeInfoByChannelId(String channelId) {
 		voiceChannelInfo.remove(channelId);
 	}
 

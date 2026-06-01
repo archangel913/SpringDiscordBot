@@ -53,8 +53,6 @@ public class VoiceOpcode8Service implements VoiceOpcodeServiceInterface {
 		heartBeatService.exec(voiceInfo.getHeartBeatInterval());
 
 		// TODO voiceハートビートの再接続処理
-		// TODO ユーザー側から切断された時の処理
-		// TODO Udpコネクションの掃除
 	}
 
 	@Override

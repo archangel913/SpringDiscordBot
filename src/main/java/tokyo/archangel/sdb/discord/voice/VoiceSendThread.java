@@ -3,6 +3,7 @@ package tokyo.archangel.sdb.discord.voice;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
@@ -42,6 +43,8 @@ public class VoiceSendThread {
 
 	private long nextTargetTime;
 
+	private volatile CompletableFuture<Void> pause = CompletableFuture.completedFuture(null);
+
 	private volatile ServiceThreadStatus status = ServiceThreadStatus.INITIALIZING;
 
 	public VoiceSendThread(DaveServiceProvider daveServiceProvider,
@@ -74,20 +77,34 @@ public class VoiceSendThread {
 
 		nextTargetTime = System.nanoTime();
 		while (status == ServiceThreadStatus.ACTIVE) {
+			if (!pause.isDone()) {
+				sleep();
+				continue;
+			}
 			byte[] data = buffer.get();
 			send(data, daveService, cryptService, udpConnection);
 		}
 	}
 
 	public void pause() {
-
+		if (!pause.isDone()) {
+			return;
+		}
+		// 新しい未完了の Future を作成することで、送信スレッドをブロック状態にする
+		pause = new CompletableFuture<>();
 	}
 
 	public void resume() {
-
+		if (pause.isDone()) {
+			return;
+		}
+		
+		pause.complete(null);
+		nextTargetTime = System.nanoTime();
 	}
 
 	public void stop() {
+		resume();
 		status = ServiceThreadStatus.TERMINATING;
 	}
 

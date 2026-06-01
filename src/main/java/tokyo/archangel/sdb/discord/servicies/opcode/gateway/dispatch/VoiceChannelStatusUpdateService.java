@@ -35,7 +35,7 @@ public class VoiceChannelStatusUpdateService implements GatewayOpcodeServiceInte
 
 		VoiceChannelInfo info = channels.generateInfo(detail.getId());
 		if (detail.getStatus() == null) {
-			channels.removeInfoBySessionId(detail.getGuildId());
+			channels.removeInfoByChannelId(detail.getGuildId());
 		} else {
 			info.setChannelId(detail.getId());
 			info.setGuildId(detail.getGuildId());

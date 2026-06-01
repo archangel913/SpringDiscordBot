@@ -37,7 +37,8 @@ public class HeartBeatServiceProvider {
 	 * @param session
 	 */
 	public void removeService(WebSocketSession session) {
-		heartBeatServices.remove(session.getId());
+		HeartBeatService heartBeatService = heartBeatServices.remove(session.getId());
+		heartBeatService.dispose();
 		log.debug("ハートビートサービスを削除しました。現在有効なサービスは" + heartBeatServices.size() + "個です");
 	}
 }

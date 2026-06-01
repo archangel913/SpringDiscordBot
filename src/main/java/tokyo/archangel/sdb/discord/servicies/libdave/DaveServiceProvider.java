@@ -6,9 +6,11 @@ import java.util.concurrent.ConcurrentMap;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 
 @Service
+@Slf4j
 public class DaveServiceProvider {
 	private final ObjectProvider<DaveServiceImpl> provider;
 
@@ -57,5 +59,6 @@ public class DaveServiceProvider {
 			return;
 		}
 		service.close();
+		log.debug("Daveサービスを削除しました。現在有効なサービスは" + daveServices.size() + "個です");
 	}
 }

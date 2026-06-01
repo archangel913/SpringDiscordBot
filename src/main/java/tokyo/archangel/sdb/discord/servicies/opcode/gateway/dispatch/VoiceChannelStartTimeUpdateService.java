@@ -39,7 +39,7 @@ public class VoiceChannelStartTimeUpdateService implements GatewayOpcodeServiceI
 		
 		VoiceChannelInfo info = channels.generateInfo(detail.getId());
 		if(detail.getVoiceStartTime() == null) {
-			channels.removeInfoBySessionId(detail.getGuildId());
+			channels.removeInfoByChannelId(detail.getGuildId());
 		} else {
 			info.setChannelId(detail.getId());
 			info.setGuildId(detail.getGuildId());

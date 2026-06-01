@@ -6,12 +6,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
 
 @Data
 @Component
+@Scope("prototype")
 public class VoiceChannelInfo {
 	/**
 	 * 音声websoketの接続先
@@ -88,6 +90,11 @@ public class VoiceChannelInfo {
 	 * 音声送信準備が整ったか
 	 */
 	private CompletableFuture<Void> readyFuture = new CompletableFuture<Void>();
+	
+	/**
+	 * 切断してるか
+	 */
+	private boolean isDisconnect = false;
 	
 	/**
 	 * 再接続を何回したか

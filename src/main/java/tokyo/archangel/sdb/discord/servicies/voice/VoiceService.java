@@ -15,13 +15,14 @@ import tokyo.archangel.sdb.discord.dto.voice.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.voice.opcode.code5.Code5Detail;
 import tokyo.archangel.sdb.discord.dto.voice.opcode.code5.Code5Dto;
 import tokyo.archangel.sdb.discord.enumeration.Speaking;
-import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatService;
 import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
 import tokyo.archangel.sdb.discord.servicies.libdave.DaveService;
 import tokyo.archangel.sdb.discord.servicies.libdave.DaveServiceProvider;
 import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcodeServiceFactory;
 import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcodeServiceInterface;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
+import tokyo.archangel.sdb.discord.servicies.transportcrypter.TransportCryptServiceProvider;
+import tokyo.archangel.sdb.discord.udp.UdpConnectionProvider;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
@@ -35,6 +36,10 @@ public class VoiceService {
 	private VoiceOpcodeServiceFactory opcodeServiceFactory;
 
 	private VoiceConnectionService connectionService;
+	
+	private UdpConnectionProvider udpConnectionProvider;
+	
+	private TransportCryptServiceProvider transportCryptServiceProvider;
 
 	private HeartBeatServiceProvider heartBeatServiceProvider;
 
@@ -46,10 +51,14 @@ public class VoiceService {
 
 	public VoiceService(VoiceOpcodeServiceFactory opcodeServiceFactory,
 			@Lazy VoiceConnectionService connectionService,
+			UdpConnectionProvider udpConnectionProvider,
+			TransportCryptServiceProvider transportCryptServiceProvider, 
 			HeartBeatServiceProvider heartBeatServiceProvider,
 			DaveServiceProvider daveServiceProvider, VoiceChannels channels) {
 		this.opcodeServiceFactory = opcodeServiceFactory;
 		this.connectionService = connectionService;
+		this.udpConnectionProvider = udpConnectionProvider;
+		this.transportCryptServiceProvider = transportCryptServiceProvider;
 		this.heartBeatServiceProvider = heartBeatServiceProvider;
 		this.daveServiceProvider = daveServiceProvider;
 		this.channels = channels;
@@ -138,7 +147,7 @@ public class VoiceService {
 			log.error("接続に5回連続で失敗しました。音声接続を切断します。");
 
 			// 音声接続切断処理
-			channels.removeInfoBySessionId(voiceInfo.getChannelId());
+			channels.removeInfoByChannelId(voiceInfo.getChannelId());
 			return;
 		}
 
@@ -152,14 +161,27 @@ public class VoiceService {
 	 * もろもろのスレッドを終了させる
 	 * @param sendMessageService
 	 */
-	public void dispose(SendMessageService sendMessageService) {
-		// ハートビート、ハートビートチェックスレッド、メッセージスレッドすべて止めることができる
-		HeartBeatService heartBeatService = heartBeatServiceProvider
-				.getHeartBeatService(sendMessageService.getSession());
-		heartBeatService.dispose();
+	public boolean dispose(SendMessageService sendMessageService) {
+		VoiceChannelInfo voiceInfo = channels.getInfoByWebsocketGuid(sendMessageService.getSession().getId());
+		String channelId = voiceInfo.getChannelId();
+		
 		heartBeatServiceProvider.removeService(sendMessageService.getSession());
 
-		// UDPのクリーンアップ必要？
+		// UDPのクリーンアップ
+		udpConnectionProvider.removeUdpConnection(channelId);
+		
+		// 暗号化器周りの解放
+		daveServiceProvider.removeDaveService(sendMessageService.getSession().getId());
+		
+		// トランスポート層暗号化の削除
+		transportCryptServiceProvider.removeCryptService(sendMessageService.getSession().getId());
+		
+		if(voiceInfo.isDisconnect()) {
+			channels.removeInfoByChannelId(channelId);
+			return true;
+		}
+		
+		return false;
 	}
 
 	private void receive(OpCodeReceiveBaseDto baseDto, SendMessageService sendMessageService) {

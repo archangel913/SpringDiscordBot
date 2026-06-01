@@ -78,7 +78,7 @@ public class UdpConnectionImpl implements UdpConnection {
 	@Async
 	public void receive() {
 		if (socket == null || socket.isClosed()) {
-			log.error("UDPソケットの初期化ができていません。");
+			log.warn("UDPソケットの初期化ができていません。");
 			return;
 		}
 
@@ -98,7 +98,7 @@ public class UdpConnectionImpl implements UdpConnection {
 		byte[] buf = new byte[BUFFER_SIZE];
 		DatagramPacket receivePacket = new DatagramPacket(buf, buf.length);
 
-		while (status == ServiceThreadStatus.ACTIVE) {
+		while (socket != null && !socket.isClosed()) {
 			receivePacket.setLength(buf.length);
 			try {
 				socket.receive(receivePacket);

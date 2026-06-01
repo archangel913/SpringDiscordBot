@@ -63,15 +63,11 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 		// スレッドの終了処理が実行されているとは限らないので
 		// 再度終了処理を呼んでおく
 		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session);
-		discordVoiceService.dispose(service);
 
 		// 切断フラグが上がっていれば後続処理を行わない
-		if (isDisconennct) {
+		if (isDisconennct || discordVoiceService.dispose(service)) {
 			return;
 		}
-		
-		// TODO ユーザーの操作で切られたりしたときは再接続を行わない
-		// ステータスコードで判断
 
 		// 再接続処理
 		

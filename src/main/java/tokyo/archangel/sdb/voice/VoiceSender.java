@@ -14,18 +14,22 @@ public interface VoiceSender {
 	 * @param selfDeaf スピーカーミュートするか
 	 * @return 接続成功した場合true 失敗した場合false
 	 */
-	public void connectAsync(String guildId, String channelId, boolean selfMute,  boolean selfDeaf);
+	public void connect(String guildId, String channelId, boolean selfMute,  boolean selfDeaf);
 	
 	/**
 	 * ボイスチャンネルから切断します
 	 * @return 切断成功した場合true 失敗した場合false
 	 */
-	public void disconnectAsync();
+	public void disconnect();
 	
 	/**
 	 * ボイスチャンネルへデータを送信します<br>
 	 * @param data 音声データ PCM音源です。
 	 * @return
 	 */
-	public void sendAsync(byte[] data) throws InterruptedException;
+	public void send(byte[] data) throws InterruptedException;
+	
+	public void pause();
+	
+	public void resume();
 }
