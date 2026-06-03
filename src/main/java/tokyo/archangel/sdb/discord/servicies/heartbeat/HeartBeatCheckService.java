@@ -73,6 +73,7 @@ public class HeartBeatCheckService {
 				LocalDateTime now = LocalDateTime.now();
 				if (time != null && time.isBefore(now)) {
 					log.warn("ハートビートが確認できませんでした。");
+					// 音声ハートビートにも対応
 					gatewayInfo.setReconnectMode(ReconnectMode.NORMAL);
 					break;
 				}

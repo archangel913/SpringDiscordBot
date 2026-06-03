@@ -77,7 +77,7 @@ public class UdpConnectionImpl implements UdpConnection {
 	 */
 	@Async
 	public void receive() {
-		if (socket == null || socket.isClosed()) {
+		if (isClosed()) {
 			log.warn("UDPソケットの初期化ができていません。");
 			return;
 		}
@@ -98,7 +98,7 @@ public class UdpConnectionImpl implements UdpConnection {
 		byte[] buf = new byte[BUFFER_SIZE];
 		DatagramPacket receivePacket = new DatagramPacket(buf, buf.length);
 
-		while (socket != null && !socket.isClosed()) {
+		while (!isClosed()) {
 			receivePacket.setLength(buf.length);
 			try {
 				socket.receive(receivePacket);
@@ -119,13 +119,18 @@ public class UdpConnectionImpl implements UdpConnection {
 
 	@Override
 	public void send(byte[] data) throws IOException {
-		if (socket == null || socket.isClosed()) {
+		if (isClosed()) {
 			log.error("UDPソケットの初期化ができていません。");
 			return;
 		}
 
 		DatagramPacket sendPacket = new DatagramPacket(data, data.length, targetAddress, targetPort);
 		socket.send(sendPacket);
+	}
+	
+	@Override
+	public boolean isClosed() {
+		return socket == null || socket.isClosed();
 	}
 
 	@PreDestroy
@@ -148,7 +153,7 @@ public class UdpConnectionImpl implements UdpConnection {
 		}
 
 		// ソケットが開いていれば安全に閉じる
-		if (socket != null && !socket.isClosed()) {
+		if (!isClosed()) {
 			log.info("UDP接続をクローズします。");
 			socket.close(); // これにより receive() スレッドがブロック中なら強制解除される
 		}

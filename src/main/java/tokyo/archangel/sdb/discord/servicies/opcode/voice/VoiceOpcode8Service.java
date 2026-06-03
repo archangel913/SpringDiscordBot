@@ -51,8 +51,6 @@ public class VoiceOpcode8Service implements VoiceOpcodeServiceInterface {
 		heartBeatService.setSendMessageService(sendMessageService);
 		heartBeatService.setVoiceChannelInfo(voiceInfo);
 		heartBeatService.exec(voiceInfo.getHeartBeatInterval());
-
-		// TODO voiceハートビートの再接続処理
 	}
 
 	@Override

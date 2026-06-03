@@ -14,4 +14,10 @@ public interface UdpConnection {
 	 * @throws IOException
 	 */
 	public void send(byte[] data) throws IOException;
+	
+	/**
+	 * コネクションが閉じてるか
+	 * @return 閉じていたらtrue
+	 */
+	public boolean isClosed();
 }

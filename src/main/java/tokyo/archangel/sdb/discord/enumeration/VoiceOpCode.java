@@ -22,6 +22,8 @@ public enum VoiceOpCode {
 	RESUME(7),
 	/** opcode 8 */
 	HELLO(8),
+	/** opcode 9 */
+	RESUMED(9),
 	/** opcode 11 */
 	CLIENTS_CONNECT(11),
 	/** opcode 13 */

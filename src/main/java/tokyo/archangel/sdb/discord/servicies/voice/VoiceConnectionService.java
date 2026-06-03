@@ -77,7 +77,7 @@ public class VoiceConnectionService {
 					} else {
 						log.error("voiceWebsocket接続失敗", ex);
 					}
-				});
+				}).join();
 	}
 
 	public void reconnect(VoiceChannelInfo info) {
@@ -92,6 +92,7 @@ public class VoiceConnectionService {
 						SendMessageService sendMessageService = sendMessageServiceProvider
 								.generateSendMessageService(session);
 						sendMessageService.exec();
+						info.setOldWebsocketGuid(info.getWebsocketGuid());
 						info.setWebsocketGuid(session.getId());
 
 						if (canConnect(info)) {
@@ -109,7 +110,7 @@ public class VoiceConnectionService {
 					} else {
 						log.error("voiceWebsocket接続失敗", ex);
 					}
-				});
+				}).join();
 	}
 
 	private String generateReconnectJson(VoiceChannelInfo info) {

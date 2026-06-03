@@ -8,6 +8,7 @@ import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code4.Code4Detail;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code4.Code4Dto;
+import tokyo.archangel.sdb.discord.enumeration.ConnectingState;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
 import tokyo.archangel.sdb.voice.VoiceSender;
@@ -48,6 +49,10 @@ public class VoiceSenderImpl implements VoiceSender {
 	public void connect(String guildId, String channelId, boolean selfMute,
 			boolean selfDeaf) {
 		voiceInfo = voiceChannels.generateInfo(channelId);
+		voiceInfo.setConnectingState(ConnectingState.CONNECTING);
+		
+		voiceInfo.setMute(selfMute);
+		voiceInfo.setDeaf(selfDeaf);
 
 		SendMessageService messageService = sendMessageServiceProvider.getServiceByChannelId(GATEWAY);
 		Code4Dto dto = new Code4Dto(new Code4Detail(guildId, channelId, selfMute, selfDeaf));
@@ -60,6 +65,7 @@ public class VoiceSenderImpl implements VoiceSender {
 		// 送信ループ実行
 		sendThread.init(binaryBuffer, voiceInfo);
 		sendThread.send();
+		voiceInfo.setConnectingState(ConnectingState.CONNECTED);
 	}
 
 	@Override
@@ -69,7 +75,7 @@ public class VoiceSenderImpl implements VoiceSender {
 			log.warn("音声情報の取得に失敗しました。音声が接続されているか確認してください。");
 			return;
 		}
-		voiceInfo.setDisconnect(true);
+		voiceInfo.setConnectingState(ConnectingState.DISCONNECTING);
 
 		sendThread.stop();
 

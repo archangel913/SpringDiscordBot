@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
+import tokyo.archangel.sdb.discord.enumeration.ConnectingState;
 
 @Data
 @Component
@@ -80,6 +81,21 @@ public class VoiceChannelInfo {
 	 * websocketのGUID
 	 */
 	private String websocketGuid;
+	
+	/**
+	 * 再接続前のwebsocketのGUID
+	 */
+	private String oldWebsocketGuid;
+	
+	/**
+	 * マイクミュートか
+	 */
+	private boolean mute;
+	
+	/**
+	 * スピーカーミュートか
+	 */
+	private boolean deaf;
 
 	/**
 	 * シーケンス
@@ -92,9 +108,9 @@ public class VoiceChannelInfo {
 	private CompletableFuture<Void> readyFuture = new CompletableFuture<Void>();
 	
 	/**
-	 * 切断してるか
+	 * 接続状態
 	 */
-	private boolean isDisconnect = false;
+	private ConnectingState connectingState = ConnectingState.CONNECTING;
 	
 	/**
 	 * 再接続を何回したか

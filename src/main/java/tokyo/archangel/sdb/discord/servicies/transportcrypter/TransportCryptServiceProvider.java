@@ -50,7 +50,17 @@ public class TransportCryptServiceProvider {
 	 * @return 対象のチャンネルIDのE2EEサービス。ただし、見つからない場合NULL。
 	 */
 	public TransportCryptService getCryptService(String websocketGuid) {
+		log.debug("現在有効なトランスポート暗号化サービスは" + cryptServices.size() + "個です");
 		return cryptServices.get(websocketGuid);
+	}
+
+	public void moveCryptService(String oldGuid, String newGuid) {
+		TransportCryptServiceImpl service = cryptServices.remove(oldGuid);
+		if (service == null) {
+			return;
+		}
+		cryptServices.put(newGuid, service);
+		log.debug("現在有効なトランスポート暗号化サービスは" + cryptServices.size() + "個です");
 	}
 
 	/**

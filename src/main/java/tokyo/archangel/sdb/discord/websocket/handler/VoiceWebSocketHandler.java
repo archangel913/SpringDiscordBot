@@ -25,7 +25,7 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 
 	private SendMessageServiceProvider sendMessageServiceProvider;
 	
-	private boolean isDisconennct = false;
+	private boolean isClose = false;
 
 	public VoiceWebSocketHandler(VoiceService discordVoiceService, ApplicationProperties properties,
 			SendMessageServiceProvider sendMessageServiceProvider) {
@@ -60,23 +60,26 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 		log.debug(String.valueOf(status.getCode()));
 		log.debug(status.getReason());
 		
-		// スレッドの終了処理が実行されているとは限らないので
-		// 再度終了処理を呼んでおく
-		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session);
+		// discord側から明示的に切断されていたら再接続しない
+		if(status.getCode() == 4014 || isClose) {
+			discordVoiceService.setDisconnectingStatus(session);
+		}
+		
+		// 終了処理
+		boolean isDisconnect = discordVoiceService.close(session);
 
 		// 切断フラグが上がっていれば後続処理を行わない
-		if (isDisconennct || discordVoiceService.dispose(service)) {
+		if (isDisconnect) {
 			return;
 		}
 
 		// 再接続処理
-		
-		// TODO 再開に失敗した場合、再度新規接続を行う必要がある
+		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session);
 		discordVoiceService.reconnect(service);
 	}
 	
 	@PreDestroy
-	public void onShutdown() {
-		this.isDisconennct = true;
+	public void close() {
+		this.isClose = true;
 	}
 }

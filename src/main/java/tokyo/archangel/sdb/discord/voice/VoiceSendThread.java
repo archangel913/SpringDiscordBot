@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
+import tokyo.archangel.sdb.discord.enumeration.ConnectingState;
 import tokyo.archangel.sdb.discord.enumeration.ServiceThreadStatus;
 import tokyo.archangel.sdb.discord.servicies.libdave.DaveService;
 import tokyo.archangel.sdb.discord.servicies.libdave.DaveServiceProvider;
@@ -77,6 +78,19 @@ public class VoiceSendThread {
 
 		nextTargetTime = System.nanoTime();
 		while (status == ServiceThreadStatus.ACTIVE) {
+			// 再認証による再接続があった際、UDP・暗号器がすべて書き変わる
+			// 送信中にこれらが下記変わった場合、再取得する必要がある
+			if(!voiceInfo.getReadyFuture().isDone()) {
+				voiceInfo.getReadyFuture().join();
+				udpConnection = udpConnectionProvider.getUdpConnection(voiceInfo.getChannelId());
+				daveService = daveServiceProvider.getDaveService(voiceInfo.getWebsocketGuid());
+				cryptService = transportCryptServiceProvider.generateCryptService(
+						voiceInfo.getWebsocketGuid(),
+						voiceInfo.getInfo().getSecretKey());
+				nextTargetTime = System.nanoTime();
+				voiceInfo.setConnectingState(ConnectingState.CONNECTED);
+			}
+			
 			if (!pause.isDone()) {
 				sleep();
 				continue;
@@ -127,7 +141,7 @@ public class VoiceSendThread {
 
 	private void send(byte[] data, DaveService daveService, TransportCryptService cryptService,
 			UdpConnection udpConnection) {
-		if (data == null || data.length == 0 || udpConnection == null) {
+		if (data == null || data.length == 0) {
 			sleep();
 			return;
 		}

@@ -4,16 +4,21 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
+import tokyo.archangel.sdb.discord.dto.gateway.opcode.code4.Code4Detail;
+import tokyo.archangel.sdb.discord.dto.gateway.opcode.code4.Code4Dto;
 import tokyo.archangel.sdb.discord.dto.voice.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.voice.opcode.code5.Code5Detail;
 import tokyo.archangel.sdb.discord.dto.voice.opcode.code5.Code5Dto;
+import tokyo.archangel.sdb.discord.enumeration.ConnectingState;
 import tokyo.archangel.sdb.discord.enumeration.Speaking;
 import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
 import tokyo.archangel.sdb.discord.servicies.libdave.DaveService;
@@ -21,6 +26,7 @@ import tokyo.archangel.sdb.discord.servicies.libdave.DaveServiceProvider;
 import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcodeServiceFactory;
 import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcodeServiceInterface;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
+import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
 import tokyo.archangel.sdb.discord.servicies.transportcrypter.TransportCryptServiceProvider;
 import tokyo.archangel.sdb.discord.udp.UdpConnectionProvider;
 import tools.jackson.core.JacksonException;
@@ -36,9 +42,9 @@ public class VoiceService {
 	private VoiceOpcodeServiceFactory opcodeServiceFactory;
 
 	private VoiceConnectionService connectionService;
-	
+
 	private UdpConnectionProvider udpConnectionProvider;
-	
+
 	private TransportCryptServiceProvider transportCryptServiceProvider;
 
 	private HeartBeatServiceProvider heartBeatServiceProvider;
@@ -47,14 +53,17 @@ public class VoiceService {
 
 	private VoiceChannels channels;
 
+	private SendMessageServiceProvider sendMessageServiceProvider;
+
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	public VoiceService(VoiceOpcodeServiceFactory opcodeServiceFactory,
 			@Lazy VoiceConnectionService connectionService,
 			UdpConnectionProvider udpConnectionProvider,
-			TransportCryptServiceProvider transportCryptServiceProvider, 
+			TransportCryptServiceProvider transportCryptServiceProvider,
 			HeartBeatServiceProvider heartBeatServiceProvider,
-			DaveServiceProvider daveServiceProvider, VoiceChannels channels) {
+			DaveServiceProvider daveServiceProvider, VoiceChannels channels,
+			SendMessageServiceProvider sendMessageServiceProvider) {
 		this.opcodeServiceFactory = opcodeServiceFactory;
 		this.connectionService = connectionService;
 		this.udpConnectionProvider = udpConnectionProvider;
@@ -62,6 +71,7 @@ public class VoiceService {
 		this.heartBeatServiceProvider = heartBeatServiceProvider;
 		this.daveServiceProvider = daveServiceProvider;
 		this.channels = channels;
+		this.sendMessageServiceProvider = sendMessageServiceProvider;
 	}
 
 	public void receive(String json, SendMessageService service) {
@@ -97,7 +107,7 @@ public class VoiceService {
 						.put((byte) 26)
 						.put(keyPackage)
 						.array();
-				
+
 				// 生成したキーパッケージを送り返す
 				sendMessageService.sendMessage(returnPayload);
 			} else if (opcode == 27) {
@@ -153,34 +163,75 @@ public class VoiceService {
 
 		voiceInfo.setConnectionFailCount(failCount);
 
-		connectionService.reconnect(voiceInfo);
-		log.info("再接続が完了しました");
+		if (voiceInfo.getConnectingState() == ConnectingState.RESUMING) {
+			// opcode7で再開を行う場合
+			connectionService.reconnect(voiceInfo);
+
+			// 各サービスのGUIDを付け替える
+			daveServiceProvider.moveDaveService(voiceInfo.getOldWebsocketGuid(), voiceInfo.getWebsocketGuid());
+			transportCryptServiceProvider.moveCryptService(voiceInfo.getOldWebsocketGuid(),
+					voiceInfo.getWebsocketGuid());
+		} else {
+			// 認証からやり直す場合
+
+			// 音声を再生不可にする
+			voiceInfo.setReadyFuture(new CompletableFuture<>());
+
+			SendMessageService messageService = sendMessageServiceProvider.getServiceByChannelId("gateway");
+			Code4Dto dto = new Code4Dto(
+					new Code4Detail(voiceInfo.getGuildId(), voiceInfo.getChannelId(), voiceInfo.isMute(),
+							voiceInfo.isDeaf()));
+			String json = objectMapper.writeValueAsString(dto);
+			messageService.sendMessage(json);
+		}
+	}
+
+	/**
+	 * ステータスを切断中にする
+	 * @param session
+	 */
+	public void setDisconnectingStatus(WebSocketSession session) {
+		VoiceChannelInfo voiceInfo = channels.getInfoByWebsocketGuid(session.getId());
+		voiceInfo.setConnectingState(ConnectingState.DISCONNECTING);
 	}
 
 	/**
 	 * もろもろのスレッドを終了させる
 	 * @param sendMessageService
+	 * @return 再接続しないのであればtrue
 	 */
-	public boolean dispose(SendMessageService sendMessageService) {
-		VoiceChannelInfo voiceInfo = channels.getInfoByWebsocketGuid(sendMessageService.getSession().getId());
+	public boolean close(WebSocketSession session) {
+		VoiceChannelInfo voiceInfo = channels.getInfoByWebsocketGuid(session.getId());
 		String channelId = voiceInfo.getChannelId();
-		
-		heartBeatServiceProvider.removeService(sendMessageService.getSession());
+
+		heartBeatServiceProvider.removeService(session);
+
+		// 再開の時
+		if (voiceInfo.getConnectingState() == ConnectingState.CONNECTED) {
+			log.debug("再開します。");
+			voiceInfo.setConnectingState(ConnectingState.RESUMING);
+			return false;
+		}
 
 		// UDPのクリーンアップ
 		udpConnectionProvider.removeUdpConnection(channelId);
-		
+
 		// 暗号化器周りの解放
-		daveServiceProvider.removeDaveService(sendMessageService.getSession().getId());
-		
+		daveServiceProvider.removeDaveService(session.getId());
+
 		// トランスポート層暗号化の削除
-		transportCryptServiceProvider.removeCryptService(sendMessageService.getSession().getId());
-		
-		if(voiceInfo.isDisconnect()) {
+		transportCryptServiceProvider.removeCryptService(session.getId());
+
+		// 切断の時
+		if (voiceInfo.getConnectingState() == ConnectingState.DISCONNECTING) {
+			voiceInfo.setConnectingState(ConnectingState.DISCONNECTED);
 			channels.removeInfoByChannelId(channelId);
 			return true;
 		}
-		
+
+		// ここに来るときは再開も失敗して認証からやり直す必要があるとき
+		voiceInfo.setConnectingState(ConnectingState.RECONNECTING);
+		log.debug("再接続します。");
 		return false;
 	}
 

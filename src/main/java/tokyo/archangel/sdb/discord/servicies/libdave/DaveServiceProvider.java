@@ -46,7 +46,22 @@ public class DaveServiceProvider {
 	 * @return 対象のチャンネルIDのE2EEサービス。ただし、見つからない場合NULL。
 	 */
 	public DaveService getDaveService(String websocketGuid) {
+		log.debug("現在有効なDaveサービスは" + daveServices.size() + "個です");
 		return daveServices.get(websocketGuid);
+	}
+	
+	/**
+	 * E2EEサービスのGUIDを付け替える
+	 * @param oldGuid
+	 * @param newGuid
+	 */
+	public void moveDaveService(String oldGuid, String newGuid) {
+		DaveServiceImpl service = daveServices.remove(oldGuid);
+		if(service == null) {
+			return;
+		}
+		daveServices.put(newGuid, service);
+		log.debug("現在有効なDaveサービスは" + daveServices.size() + "個です");
 	}
 
 	/**
