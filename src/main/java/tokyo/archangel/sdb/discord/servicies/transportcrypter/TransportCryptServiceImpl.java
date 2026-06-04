@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 @Service
 @Scope("prototype")
 public class TransportCryptServiceImpl implements TransportCryptService {
-	// WebSocket(OPCODE 4等)で取得した32バイトの鍵
 	private byte[] secretKey = null;
 	private int nonce = 0;
+	private byte[] nonceBytes = new byte[12];
+
+	private final ByteBuffer packetBuffer = ByteBuffer.allocate(4096);
 
 	public void setKey(byte[] secretKey) {
 		this.secretKey = secretKey;
@@ -32,9 +34,6 @@ public class TransportCryptServiceImpl implements TransportCryptService {
 	@Override
 	public byte[] encryptPacket(byte[] rtpHeader, byte[] opusPayload) {
 		try {
-			// 1. Nonceの準備 (12バイト、先頭4バイトがカウンター)
-			byte[] nonceBytes = new byte[12];
-
 			// カウンターをインクリメント（Pythonの self._nonce += 1 に相当）
 			// ※溢れた場合はJavaのintの挙動で自動的にループ、または手動でマスクしてもOK
 			nonce++;
@@ -45,11 +44,8 @@ public class TransportCryptServiceImpl implements TransportCryptService {
 			nonceBytes[2] = (byte) (nonce >> 8);
 			nonceBytes[3] = (byte) nonce;
 
-			// Pythonの nonce_padding = nonce[:4] に相当
-			byte[] noncePadding = new byte[4];
-			System.arraycopy(nonceBytes, 0, noncePadding, 0, 4);
-
 			// 2. AES-GCMによる暗号化
+			// TODO パフォーマンスチューニング(getInstanceが重い。ThreadLocalを検討)
 			Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
 			SecretKeySpec keySpec = new SecretKeySpec(secretKey, "AES");
 			GCMParameterSpec gcmSpec = new GCMParameterSpec(128, nonceBytes); // 128bit = 16バイトのタグ
@@ -62,14 +58,15 @@ public class TransportCryptServiceImpl implements TransportCryptService {
 			byte[] encryptedPayload = cipher.doFinal(opusPayload);
 
 			// 3. パケットの組み立て
-			// 全体長 = RTPヘッダー(12) + 暗号文&タグ(encryptedPayload) + カウンター(4)
-			ByteBuffer packet = ByteBuffer.allocate(rtpHeader.length + encryptedPayload.length + noncePadding.length);
+			packetBuffer.clear();
+			packetBuffer.put(rtpHeader);
+			packetBuffer.put(encryptedPayload);
+			packetBuffer.put(nonceBytes, 0, 4);
 
-			packet.put(rtpHeader); // 先頭にRTPヘッダー
-			packet.put(encryptedPayload); // 続いて暗号化されたペイロード（タグ付き）
-			packet.put(noncePadding); // 末尾に4バイトのカウンターパディング
-
-			return packet.array();
+			packetBuffer.flip();
+			byte[] result = new byte[packetBuffer.limit()];
+			packetBuffer.get(result);
+			return result;
 
 		} catch (Exception e) {
 			return null;
