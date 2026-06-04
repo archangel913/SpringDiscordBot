@@ -2,7 +2,7 @@ package tokyo.archangel.sdb.discord.servicies.libdave;
 
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 
-public interface DaveService {
+public interface E2eeCryptService {
 
 	/**
 	 * 初期化処理

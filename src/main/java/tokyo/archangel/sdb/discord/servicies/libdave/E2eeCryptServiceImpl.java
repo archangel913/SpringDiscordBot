@@ -20,7 +20,7 @@ import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
  */
 @Service
 @Scope("prototype")
-public class DaveServiceImpl implements DaveService {
+public class E2eeCryptServiceImpl implements E2eeCryptService {
 	Pointer session;
 
 	Pointer encryptor;

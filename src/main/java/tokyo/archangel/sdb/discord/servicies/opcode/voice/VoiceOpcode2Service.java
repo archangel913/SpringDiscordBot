@@ -19,8 +19,8 @@ import tokyo.archangel.sdb.discord.dto.voice.opcode.code2.Code2Dto;
 import tokyo.archangel.sdb.discord.dto.voice.opcode.code2.Streams;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
+import tokyo.archangel.sdb.discord.servicies.voice.VoiceSessionProvider;
 import tokyo.archangel.sdb.discord.udp.UdpConnection;
-import tokyo.archangel.sdb.discord.udp.UdpConnectionProvider;
 
 @Service
 @Slf4j
@@ -30,14 +30,14 @@ public class VoiceOpcode2Service implements VoiceOpcodeServiceInterface {
 
 	private SendMessageService sendMessageService;
 
-	private UdpConnectionProvider udpConnectionProvider;
+	private VoiceSessionProvider voiceSessionProvider;
 
 	private VoiceChannels channels;
 
-	public VoiceOpcode2Service(UdpConnectionProvider udpConnectionProvider,
+	public VoiceOpcode2Service(VoiceSessionProvider voiceSessionProvider,
 			SendMessageServiceProvider messageServiceProvider,
 			VoiceChannels channels) {
-		this.udpConnectionProvider = udpConnectionProvider;
+		this.voiceSessionProvider = voiceSessionProvider;
 		this.messageServiceProvider = messageServiceProvider;
 		this.channels = channels;
 	}
@@ -55,7 +55,7 @@ public class VoiceOpcode2Service implements VoiceOpcodeServiceInterface {
 
 		// メッセージサービスにssrcを設定
 		messageServiceProvider.setSsrc(sendMessageService.getSession(), code2dto.getDetail().getSsrc());
-		
+
 		VoiceChannelInfo voiceInfo = channels.getInfoByWebsocketGuid(sendMessageService.getSession().getId());
 
 		// 各種値を設定
@@ -64,14 +64,12 @@ public class VoiceOpcode2Service implements VoiceOpcodeServiceInterface {
 		// UDPコネクションを作成
 		String ip = code2dto.getDetail().getIp();
 		int port = code2dto.getDetail().getPort();
-		UdpConnection udpConnection = udpConnectionProvider.generateUdpConnection(voiceInfo.getChannelId(), ip, port);
-		
 		try {
+			UdpConnection udpConnection = voiceSessionProvider.getUdpConnection(voiceInfo.getChannelId(), ip, port);
 			byte[] data = generateIpDiscoveryPayload(code2dto);
 			udpConnection.send(data);
 		} catch (IOException e) {
-			log.error("IpDiscovery送信に失敗しました。");
-			e.printStackTrace();
+			log.error("IpDiscovery送信に失敗しました。", e);
 		}
 	}
 

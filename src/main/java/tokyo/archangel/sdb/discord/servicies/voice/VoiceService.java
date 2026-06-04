@@ -21,14 +21,11 @@ import tokyo.archangel.sdb.discord.dto.voice.opcode.code5.Code5Dto;
 import tokyo.archangel.sdb.discord.enumeration.ConnectingState;
 import tokyo.archangel.sdb.discord.enumeration.Speaking;
 import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
-import tokyo.archangel.sdb.discord.servicies.libdave.DaveService;
-import tokyo.archangel.sdb.discord.servicies.libdave.DaveServiceProvider;
+import tokyo.archangel.sdb.discord.servicies.libdave.E2eeCryptService;
 import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcodeServiceFactory;
 import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcodeServiceInterface;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
-import tokyo.archangel.sdb.discord.servicies.transportcrypter.TransportCryptServiceProvider;
-import tokyo.archangel.sdb.discord.udp.UdpConnectionProvider;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
@@ -43,13 +40,9 @@ public class VoiceService {
 
 	private VoiceConnectionService connectionService;
 
-	private UdpConnectionProvider udpConnectionProvider;
-
-	private TransportCryptServiceProvider transportCryptServiceProvider;
-
 	private HeartBeatServiceProvider heartBeatServiceProvider;
 
-	private DaveServiceProvider daveServiceProvider;
+	private VoiceSessionProvider voiceSessionProvider;
 
 	private VoiceChannels channels;
 
@@ -59,17 +52,13 @@ public class VoiceService {
 
 	public VoiceService(VoiceOpcodeServiceFactory opcodeServiceFactory,
 			@Lazy VoiceConnectionService connectionService,
-			UdpConnectionProvider udpConnectionProvider,
-			TransportCryptServiceProvider transportCryptServiceProvider,
 			HeartBeatServiceProvider heartBeatServiceProvider,
-			DaveServiceProvider daveServiceProvider, VoiceChannels channels,
+			VoiceSessionProvider voiceSessionProvider, VoiceChannels channels,
 			SendMessageServiceProvider sendMessageServiceProvider) {
 		this.opcodeServiceFactory = opcodeServiceFactory;
 		this.connectionService = connectionService;
-		this.udpConnectionProvider = udpConnectionProvider;
-		this.transportCryptServiceProvider = transportCryptServiceProvider;
 		this.heartBeatServiceProvider = heartBeatServiceProvider;
-		this.daveServiceProvider = daveServiceProvider;
+		this.voiceSessionProvider = voiceSessionProvider;
 		this.channels = channels;
 		this.sendMessageServiceProvider = sendMessageServiceProvider;
 	}
@@ -89,7 +78,8 @@ public class VoiceService {
 	public void recieve(ByteBuffer data, SendMessageService sendMessageService) {
 		log.trace("バイナリを受信しました。サイズ: " + data.array().length);
 
-		DaveService daveService = daveServiceProvider.getDaveService(sendMessageService.getSession().getId());
+		E2eeCryptService daveService = voiceSessionProvider
+				.getE2eeCryptService(sendMessageService.getSession().getId());
 		if (daveService == null) {
 			log.error("E2EEサービスの取得に失敗しました。処理を実行しません。");
 			return;
@@ -167,10 +157,8 @@ public class VoiceService {
 			// opcode7で再開を行う場合
 			connectionService.reconnect(voiceInfo);
 
-			// 各サービスのGUIDを付け替える
-			daveServiceProvider.moveDaveService(voiceInfo.getOldWebsocketGuid(), voiceInfo.getWebsocketGuid());
-			transportCryptServiceProvider.moveCryptService(voiceInfo.getOldWebsocketGuid(),
-					voiceInfo.getWebsocketGuid());
+			// サービスのGUIDを付け替える
+			voiceSessionProvider.moveDaveService(voiceInfo.getOldWebsocketGuid(), voiceInfo.getWebsocketGuid());
 		} else {
 			// 認証からやり直す場合
 
@@ -213,14 +201,8 @@ public class VoiceService {
 			return false;
 		}
 
-		// UDPのクリーンアップ
-		udpConnectionProvider.removeUdpConnection(channelId);
-
-		// 暗号化器周りの解放
-		daveServiceProvider.removeDaveService(session.getId());
-
-		// トランスポート層暗号化の削除
-		transportCryptServiceProvider.removeCryptService(session.getId());
+		// UDP・暗号化まわりの削除
+		voiceSessionProvider.removeServicies(session.getId());
 
 		// 切断の時
 		if (voiceInfo.getConnectingState() == ConnectingState.DISCONNECTING) {

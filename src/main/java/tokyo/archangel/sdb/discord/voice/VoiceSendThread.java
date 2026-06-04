@@ -13,26 +13,20 @@ import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.discord.enumeration.ConnectingState;
 import tokyo.archangel.sdb.discord.enumeration.ServiceThreadStatus;
-import tokyo.archangel.sdb.discord.servicies.libdave.DaveService;
-import tokyo.archangel.sdb.discord.servicies.libdave.DaveServiceProvider;
+import tokyo.archangel.sdb.discord.servicies.libdave.E2eeCryptService;
 import tokyo.archangel.sdb.discord.servicies.libopus.OpusEncodeService;
 import tokyo.archangel.sdb.discord.servicies.transportcrypter.TransportCryptService;
-import tokyo.archangel.sdb.discord.servicies.transportcrypter.TransportCryptServiceProvider;
+import tokyo.archangel.sdb.discord.servicies.voice.VoiceSessionProvider;
 import tokyo.archangel.sdb.discord.udp.UdpConnection;
-import tokyo.archangel.sdb.discord.udp.UdpConnectionProvider;
 
 @Component
 @Scope("prototype")
 @Slf4j
 public class VoiceSendThread {
 
-	private DaveServiceProvider daveServiceProvider;
-
-	private TransportCryptServiceProvider transportCryptServiceProvider;
+	private VoiceSessionProvider voiceSessionProvider;
 
 	private OpusEncodeService opusEncoder;
-
-	private UdpConnectionProvider udpConnectionProvider;
 
 	private VoiceChannelInfo voiceInfo;
 
@@ -48,14 +42,10 @@ public class VoiceSendThread {
 
 	private volatile ServiceThreadStatus status = ServiceThreadStatus.INITIALIZING;
 
-	public VoiceSendThread(DaveServiceProvider daveServiceProvider,
-			TransportCryptServiceProvider transportCryptServiceProvider,
-			OpusEncodeService opusEncoder,
-			UdpConnectionProvider udpConnectionProvider) {
-		this.daveServiceProvider = daveServiceProvider;
-		this.transportCryptServiceProvider = transportCryptServiceProvider;
+	public VoiceSendThread(VoiceSessionProvider voiceSessionProvider,
+			OpusEncodeService opusEncoder) {
+		this.voiceSessionProvider = voiceSessionProvider;
 		this.opusEncoder = opusEncoder;
-		this.udpConnectionProvider = udpConnectionProvider;
 	}
 
 	public void init(VoiceBinaryBuffer buffer, VoiceChannelInfo voiceInfo) {
@@ -69,34 +59,38 @@ public class VoiceSendThread {
 	 */
 	@Async
 	public void send() {
-		status = ServiceThreadStatus.ACTIVE;
-		UdpConnection udpConnection = udpConnectionProvider.getUdpConnection(voiceInfo.getChannelId());
-		DaveService daveService = daveServiceProvider.getDaveService(voiceInfo.getWebsocketGuid());
-		TransportCryptService cryptService = transportCryptServiceProvider.generateCryptService(
-				voiceInfo.getWebsocketGuid(),
-				voiceInfo.getInfo().getSecretKey());
+		try {
+			status = ServiceThreadStatus.ACTIVE;
+			UdpConnection udpConnection = voiceSessionProvider.getUdpConnection(voiceInfo.getChannelId());
+			E2eeCryptService daveService = voiceSessionProvider.getE2eeCryptService(voiceInfo.getWebsocketGuid());
+			TransportCryptService cryptService = voiceSessionProvider.getTransportCryptService(
+					voiceInfo.getWebsocketGuid(),
+					voiceInfo.getInfo().getSecretKey());
 
-		nextTargetTime = System.nanoTime();
-		while (status == ServiceThreadStatus.ACTIVE) {
-			// 再認証による再接続があった際、UDP・暗号器がすべて書き変わる
-			// 送信中にこれらが下記変わった場合、再取得する必要がある
-			if(!voiceInfo.getReadyFuture().isDone()) {
-				voiceInfo.getReadyFuture().join();
-				udpConnection = udpConnectionProvider.getUdpConnection(voiceInfo.getChannelId());
-				daveService = daveServiceProvider.getDaveService(voiceInfo.getWebsocketGuid());
-				cryptService = transportCryptServiceProvider.generateCryptService(
-						voiceInfo.getWebsocketGuid(),
-						voiceInfo.getInfo().getSecretKey());
-				nextTargetTime = System.nanoTime();
-				voiceInfo.setConnectingState(ConnectingState.CONNECTED);
+			nextTargetTime = System.nanoTime();
+			while (status == ServiceThreadStatus.ACTIVE) {
+				// 再認証による再接続があった際、UDP・暗号器がすべて書き変わる
+				// 送信中にこれらが下記変わった場合、再取得する必要がある
+				if (!voiceInfo.getReadyFuture().isDone()) {
+					voiceInfo.getReadyFuture().join();
+					udpConnection = voiceSessionProvider.getUdpConnection(voiceInfo.getChannelId());
+					daveService = voiceSessionProvider.getE2eeCryptService(voiceInfo.getWebsocketGuid());
+					cryptService = voiceSessionProvider.getTransportCryptService(
+							voiceInfo.getWebsocketGuid(),
+							voiceInfo.getInfo().getSecretKey());
+					nextTargetTime = System.nanoTime();
+					voiceInfo.setConnectingState(ConnectingState.CONNECTED);
+				}
+
+				if (!pause.isDone()) {
+					sleep();
+					continue;
+				}
+				byte[] data = buffer.get();
+				send(data, daveService, cryptService, udpConnection);
 			}
-			
-			if (!pause.isDone()) {
-				sleep();
-				continue;
-			}
-			byte[] data = buffer.get();
-			send(data, daveService, cryptService, udpConnection);
+		} catch (Exception e) {
+			log.error("音声再生中に致命的なエラーが発生しました", e);
 		}
 	}
 
@@ -112,7 +106,7 @@ public class VoiceSendThread {
 		if (pause.isDone()) {
 			return;
 		}
-		
+
 		pause.complete(null);
 		nextTargetTime = System.nanoTime();
 	}
@@ -139,7 +133,7 @@ public class VoiceSendThread {
 		return buffer.array();
 	}
 
-	private void send(byte[] data, DaveService daveService, TransportCryptService cryptService,
+	private void send(byte[] data, E2eeCryptService daveService, TransportCryptService cryptService,
 			UdpConnection udpConnection) {
 		if (data == null || data.length == 0) {
 			sleep();
