@@ -1,4 +1,4 @@
-package tokyo.archangel.sdb.discord.voice;
+package tokyo.archangel.sdb.discord.servicies.voice;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -16,13 +16,14 @@ import tokyo.archangel.sdb.discord.enumeration.ServiceThreadStatus;
 import tokyo.archangel.sdb.discord.servicies.libdave.E2eeCryptService;
 import tokyo.archangel.sdb.discord.servicies.libopus.OpusEncodeService;
 import tokyo.archangel.sdb.discord.servicies.transportcrypter.TransportCryptService;
-import tokyo.archangel.sdb.discord.servicies.voice.VoiceSessionProvider;
 import tokyo.archangel.sdb.discord.udp.UdpConnection;
+import tokyo.archangel.sdb.discord.voice.VoiceBinaryBuffer;
 
 @Component
 @Scope("prototype")
 @Slf4j
-public class VoiceSendThread {
+public class VoiceSendServiceImpl implements VoiceSendService {
+	private static int threadNumber = 0;
 
 	private VoiceSessionProvider voiceSessionProvider;
 
@@ -40,9 +41,11 @@ public class VoiceSendThread {
 
 	private volatile CompletableFuture<Void> pause = CompletableFuture.completedFuture(null);
 
+	private volatile CompletableFuture<Void> sending = CompletableFuture.completedFuture(null);
+
 	private volatile ServiceThreadStatus status = ServiceThreadStatus.INITIALIZING;
 
-	public VoiceSendThread(VoiceSessionProvider voiceSessionProvider,
+	public VoiceSendServiceImpl(VoiceSessionProvider voiceSessionProvider,
 			OpusEncodeService opusEncoder) {
 		this.voiceSessionProvider = voiceSessionProvider;
 		this.opusEncoder = opusEncoder;
@@ -58,10 +61,20 @@ public class VoiceSendThread {
 	 * バッファから音声バイナリを取り出し、エンコード・暗号化して送信する
 	 */
 	@Async
-	public void send() {
+	public CompletableFuture<Void> send() {
+		if (status == ServiceThreadStatus.ACTIVE) {
+			log.debug("音声送信スレッドがすでに起動しています");
+			return CompletableFuture.completedFuture(null);
+		}
+
+		Thread currentThread = Thread.currentThread();
+		currentThread.setName("VoiceSendService-" + threadNumber + "-" + voiceInfo.getChannelId());
+		threadNumber++;
+		status = ServiceThreadStatus.ACTIVE;
+		sending = new CompletableFuture<>();
+
 		try {
-			status = ServiceThreadStatus.ACTIVE;
-			UdpConnection udpConnection = voiceSessionProvider.getUdpConnection(voiceInfo.getChannelId());
+			UdpConnection udpConnection = voiceSessionProvider.getUdpConnection(voiceInfo.getWebsocketGuid());
 			E2eeCryptService daveService = voiceSessionProvider.getE2eeCryptService(voiceInfo.getWebsocketGuid());
 			TransportCryptService cryptService = voiceSessionProvider.getTransportCryptService(
 					voiceInfo.getWebsocketGuid(),
@@ -92,6 +105,10 @@ public class VoiceSendThread {
 		} catch (Exception e) {
 			log.error("音声再生中に致命的なエラーが発生しました", e);
 		}
+		status = ServiceThreadStatus.TERMINATED;
+		sending.complete(null);
+		log.debug("音声送信サービスを終了しました");
+		return CompletableFuture.completedFuture(null);
 	}
 
 	public void pause() {
@@ -111,9 +128,10 @@ public class VoiceSendThread {
 		nextTargetTime = System.nanoTime();
 	}
 
-	public void stop() {
+	public void close() {
 		resume();
 		status = ServiceThreadStatus.TERMINATING;
+		sending.join();
 	}
 
 	private byte[] addRtpHeader() {
@@ -134,7 +152,7 @@ public class VoiceSendThread {
 	}
 
 	private void send(byte[] data, E2eeCryptService daveService, TransportCryptService cryptService,
-			UdpConnection udpConnection) {
+			UdpConnection udpConnection) throws IOException {
 		if (data == null || data.length == 0) {
 			sleep();
 			return;
@@ -149,12 +167,8 @@ public class VoiceSendThread {
 		// トランスポート層暗号化
 		byte[] sendableData = cryptService.encryptPacket(addRtpHeader(), e2eeEncryptData);
 
-		try {
-			sleep();
-			udpConnection.send(sendableData);
-		} catch (IOException e) {
-			log.error("音声送信に失敗しました。", e);
-		}
+		sleep();
+		udpConnection.send(sendableData);
 	}
 
 	/**

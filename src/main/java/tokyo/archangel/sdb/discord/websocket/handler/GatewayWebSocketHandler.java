@@ -60,7 +60,7 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 		session.setTextMessageSizeLimit(properties.getWebsocketMessageSizeLimit());
 		SendMessageService service = sendMessageServiceProvider.generateSendMessageService(session);
 		sendMessageServiceProvider.setChannelId(session, GATEWAY);
-		service.exec();
+		service.exec(GATEWAY);
 	}
 
 	@Override

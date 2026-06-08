@@ -7,7 +7,6 @@ import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code9.Code9Dto;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
-import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatService;
 import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
@@ -50,9 +49,7 @@ public class GatewayOpcode9Service implements GatewayOpcodeServiceInterface {
 			gatewayInfo.setReconnectMode(ReconnectMode.HARD);
 		}
 
-		HeartBeatService service = heartBeatServiceProvider.getHeartBeatService(sendMessageService.getSession());
-		service.dispose();
-		 heartBeatServiceProvider.removeService(sendMessageService.getSession());
+		heartBeatServiceProvider.removeService(sendMessageService.getSession());
 	}
 
 	@Override

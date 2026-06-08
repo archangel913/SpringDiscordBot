@@ -53,11 +53,12 @@ public class VoiceConnectionService {
 		client.execute(discordVoiceWebSocketHandler, "wss://" + detail.getEndpoint())
 				.whenComplete((session, ex) -> {
 					if (Objects.isNull(ex)) {
+						VoiceChannelInfo info = channels.getInfoByGuildId(detail.getGuildId());
+						
 						SendMessageService sendMessageService = sendMessageServiceProvider
 								.generateSendMessageService(session);
-						sendMessageService.exec();
+						sendMessageService.exec(info.getChannelId());
 
-						VoiceChannelInfo info = channels.getInfoByGuildId(detail.getGuildId());
 						info.setWebsocketGuid(session.getId());
 						info.setEndpoint(detail.getEndpoint());
 						info.setToken(detail.getToken());
@@ -91,7 +92,7 @@ public class VoiceConnectionService {
 						log.info("voiceWebsocket接続完了");
 						SendMessageService sendMessageService = sendMessageServiceProvider
 								.generateSendMessageService(session);
-						sendMessageService.exec();
+						sendMessageService.exec(info.getChannelId());
 						info.setOldWebsocketGuid(info.getWebsocketGuid());
 						info.setWebsocketGuid(session.getId());
 

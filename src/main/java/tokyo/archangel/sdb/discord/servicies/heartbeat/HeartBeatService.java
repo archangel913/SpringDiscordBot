@@ -1,5 +1,7 @@
 package tokyo.archangel.sdb.discord.servicies.heartbeat;
 
+import java.util.concurrent.CompletableFuture;
+
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
@@ -10,31 +12,33 @@ public interface HeartBeatService {
 	 * @param opcodeClassName
 	 */
 	public void setVoiceChannelInfo(VoiceChannelInfo voiceChannelInfo);
-	
+
 	/**
 	 * メッセージサービスを設定する
 	 * @param sendMessageService
 	 */
 	public void setSendMessageService(SendMessageService sendMessageService);
-	
+
 	/**
 	 * 処理を実行する
-	 * @param interval
+	 * @param interval ハートビート送信間隔
+	 * @param channelId チャンネルID。gatewayの場合は"gateway"
+	 * @return CompletableFuture
 	 */
-	public void exec(int interval);
-	
+	public CompletableFuture<Void> exec(int interval, String channelId);
+
 	/**
 	 * ハートビートの応答を受け取ったことを通知する
 	 */
 	public void receiveAck();
-	
+
 	/**
 	 * ハートビートの送信を行う
 	 */
 	public void sendHeartBeat(String json);
-	
+
 	/**
 	 * ハートビートを終了する
 	 */
-	public void dispose();
+	public void close();
 }

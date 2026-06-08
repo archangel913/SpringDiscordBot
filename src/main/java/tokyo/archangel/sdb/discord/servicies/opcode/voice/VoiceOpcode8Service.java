@@ -41,7 +41,7 @@ public class VoiceOpcode8Service implements VoiceOpcodeServiceInterface {
 			log.warn("必要なデータが揃っていないため処理を実行しません");
 			return;
 		}
-		
+
 		VoiceChannelInfo voiceInfo = voiceChannels.getInfoByWebsocketGuid(sendMessageService.getSession().getId());
 		voiceInfo.setHeartBeatInterval(code8dto.getDetail().getHeartbeatInterval());
 		messageServiceProvider.setChannelId(sendMessageService.getSession(), voiceInfo.getChannelId());
@@ -50,7 +50,7 @@ public class VoiceOpcode8Service implements VoiceOpcodeServiceInterface {
 				.getHeartBeatService(sendMessageService.getSession());
 		heartBeatService.setSendMessageService(sendMessageService);
 		heartBeatService.setVoiceChannelInfo(voiceInfo);
-		heartBeatService.exec(voiceInfo.getHeartBeatInterval());
+		heartBeatService.exec(voiceInfo.getHeartBeatInterval(), voiceInfo.getChannelId());
 	}
 
 	@Override

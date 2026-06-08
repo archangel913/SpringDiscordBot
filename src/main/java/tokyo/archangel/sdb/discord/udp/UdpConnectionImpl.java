@@ -9,6 +9,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
@@ -26,6 +27,7 @@ import tokyo.archangel.sdb.discord.enumeration.ServiceThreadStatus;
 @Scope("prototype")
 @Slf4j
 public class UdpConnectionImpl implements UdpConnection {
+	private static int threadNumber = 0;
 
 	private DatagramSocket socket;
 
@@ -68,7 +70,7 @@ public class UdpConnectionImpl implements UdpConnection {
 		socket.setReuseAddress(true);
 		socket.bind(new InetSocketAddress(0));
 		socket.setSoTimeout(TIMEOUT);
-		
+
 		status = ServiceThreadStatus.INITIALIZED;
 	}
 
@@ -76,45 +78,51 @@ public class UdpConnectionImpl implements UdpConnection {
 	 * 受信スレッドを立ち上げる
 	 */
 	@Async
-	public void receive() {
+	public CompletableFuture<Void> receive(String channelId) {
 		if (isClosed()) {
 			log.warn("UDPソケットの初期化ができていません。");
-			return;
+			return CompletableFuture.completedFuture(null);
 		}
 
 		if (status == ServiceThreadStatus.ACTIVE) {
 			log.warn("既に受信ループが起動しています。");
-			return;
+			return CompletableFuture.completedFuture(null);
 		}
 
 		Thread currentThread = Thread.currentThread();
-		currentThread.setName("UDP-receive");
+		currentThread.setName("UdpReceive-" + threadNumber + "-" + channelId);
 
 		log.debug("UDPの受付を開始します");
 		log.trace("受信ポート：" + socket.getLocalPort());
 		status = ServiceThreadStatus.ACTIVE;
 
-		// バッファの準備
-		byte[] buf = new byte[BUFFER_SIZE];
-		DatagramPacket receivePacket = new DatagramPacket(buf, buf.length);
+		try {
+			// バッファの準備
+			byte[] buf = new byte[BUFFER_SIZE];
+			DatagramPacket receivePacket = new DatagramPacket(buf, buf.length);
 
-		while (!isClosed()) {
-			receivePacket.setLength(buf.length);
-			try {
-				socket.receive(receivePacket);
-				byte[] receivedData = Arrays.copyOf(receivePacket.getData(), receivePacket.getLength());
-				service.recieve(receivedData);
-			} catch (SocketTimeoutException e) {
-				// タイムアウト時は何もせず次のループへ
-			} catch (SocketException e) {
-				log.debug("ソケットが閉じられたため受信を終了します。");
-				break;
-			} catch (IOException e) {
-				log.error("UDP listen中に例外が発生しました。", e);
+			while (!isClosed()) {
+				receivePacket.setLength(buf.length);
+				try {
+					socket.receive(receivePacket);
+					byte[] receivedData = Arrays.copyOf(receivePacket.getData(), receivePacket.getLength());
+					service.recieve(receivedData);
+				} catch (SocketTimeoutException e) {
+					// タイムアウト時は何もせず次のループへ
+				} catch (SocketException e) {
+					log.debug("ソケットが閉じられたため受信を終了します。");
+					break;
+				} catch (IOException e) {
+					log.error("UDP listen中に例外が発生しました。");
+					throw e;
+				}
 			}
+		} catch (Exception e) {
+			log.error("UDP受信スレッドが異常終了しました。", e);
+		} finally {
+			shutdown();
 		}
-
-		shutdown();
+		return CompletableFuture.completedFuture(null);
 	}
 
 	@Override
@@ -127,7 +135,7 @@ public class UdpConnectionImpl implements UdpConnection {
 		DatagramPacket sendPacket = new DatagramPacket(data, data.length, targetAddress, targetPort);
 		socket.send(sendPacket);
 	}
-	
+
 	@Override
 	public boolean isClosed() {
 		return socket == null || socket.isClosed();
@@ -137,7 +145,7 @@ public class UdpConnectionImpl implements UdpConnection {
 	public void close() {
 		shutdown();
 	}
-	
+
 	/**
 	 * 終了処理
 	 */

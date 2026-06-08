@@ -8,6 +8,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
+import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.ApplicationProperties;
 
@@ -55,7 +56,7 @@ public class SendMessageServiceProvider {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * ssrcからサービスを取得する<br>
 	 * 一致するサービスが無かった場合はnullを返す
@@ -70,7 +71,7 @@ public class SendMessageServiceProvider {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 特定のsessionに対して、チャンネルIDを設定する
 	 * @param session
@@ -79,14 +80,14 @@ public class SendMessageServiceProvider {
 	 */
 	public boolean setChannelId(WebSocketSession session, String channelId) {
 		SendMessageServiceImpl service = sendMessageServices.get(session.getId());
-		if(service == null) {
+		if (service == null) {
 			return false;
 		}
-		
+
 		service.setChannelId(channelId);
 		return true;
 	}
-	
+
 	/**
 	 * 特定のsessionに対して、チャンネルIDを設定する
 	 * @param session
@@ -95,10 +96,10 @@ public class SendMessageServiceProvider {
 	 */
 	public boolean setSsrc(WebSocketSession session, int ssrc) {
 		SendMessageServiceImpl service = sendMessageServices.get(session.getId());
-		if(service == null) {
+		if (service == null) {
 			return false;
 		}
-		
+
 		service.setSsrc(ssrc);
 		return true;
 	}
@@ -110,5 +111,15 @@ public class SendMessageServiceProvider {
 	public void removeService(WebSocketSession session) {
 		sendMessageServices.remove(session.getId());
 		log.debug("ハートビートサービスを削除しました。現在有効なサービスは" + sendMessageServices.size() + "個です");
+	}
+
+	@PreDestroy
+	public void close() {
+		sendMessageServices.forEach((id, service) -> {
+			if (service != null) {
+				service.close();
+			}
+		});
+		sendMessageServices.clear();
 	}
 }

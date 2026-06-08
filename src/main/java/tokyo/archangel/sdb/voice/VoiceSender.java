@@ -7,29 +7,36 @@ package tokyo.archangel.sdb.voice;
 public interface VoiceSender {
 	
 	/**
-	 * 	 * ボイスチャンネルへ接続します
+	 *  ボイスチャンネルへ接続します
 	 * @param guildId 接続するギルドID
 	 * @param channelId 接続するチャンネルID
 	 * @param selfMute マイクミュートするか
 	 * @param selfDeaf スピーカーミュートするか
-	 * @return 接続成功した場合true 失敗した場合false
 	 */
 	public void connect(String guildId, String channelId, boolean selfMute,  boolean selfDeaf);
 	
 	/**
 	 * ボイスチャンネルから切断します
-	 * @return 切断成功した場合true 失敗した場合false
 	 */
 	public void disconnect();
 	
 	/**
 	 * ボイスチャンネルへデータを送信します<br>
+	 * 音声データのサイズに指定はありませんが、配列長3840を推奨します。
 	 * @param data 音声データ PCM音源です。
-	 * @return
 	 */
 	public void send(byte[] data) throws InterruptedException;
 	
+	/**
+	 * 音声送信を停止します<br>
+	 * 音声停止中に呼び出しても副作用はありません<br>
+	 * sendメソッドの呼び出しを停止しても音声送信を停止できますが、最大1秒の遅延が発生します。
+	 */
 	public void pause();
 	
+	/**
+	 * 音声送信を再開します<br>
+	 * 音声再生中に呼び出しても副作用はありません
+	 */
 	public void resume();
 }

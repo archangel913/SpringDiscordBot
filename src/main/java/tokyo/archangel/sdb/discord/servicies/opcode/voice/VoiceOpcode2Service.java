@@ -65,7 +65,8 @@ public class VoiceOpcode2Service implements VoiceOpcodeServiceInterface {
 		String ip = code2dto.getDetail().getIp();
 		int port = code2dto.getDetail().getPort();
 		try {
-			UdpConnection udpConnection = voiceSessionProvider.getUdpConnection(voiceInfo.getChannelId(), ip, port);
+			UdpConnection udpConnection = voiceSessionProvider.getUdpConnection(sendMessageService.getSession().getId(),
+					voiceInfo.getChannelId(), ip, port);
 			byte[] data = generateIpDiscoveryPayload(code2dto);
 			udpConnection.send(data);
 		} catch (IOException e) {

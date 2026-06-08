@@ -13,6 +13,8 @@ public class VoiceSession {
 
 	private final AtomicReference<TransportCryptServiceImpl> transportCryptService = new AtomicReference<>();
 
+	private final AtomicReference<VoiceSendServiceImpl> voiceSendService = new AtomicReference<>();
+
 	public UdpConnectionImpl compareAndSetUdpConnection(UdpConnectionImpl udpConnection) {
 		if (this.udpConnection.compareAndSet(null, udpConnection)) {
 			return udpConnection; // セットに成功
@@ -35,7 +37,8 @@ public class VoiceSession {
 		return this.e2eeCryptService.get();
 	}
 
-	public TransportCryptServiceImpl compareAndSetTransportCryptService(TransportCryptServiceImpl transportCryptService) {
+	public TransportCryptServiceImpl compareAndSetTransportCryptService(
+			TransportCryptServiceImpl transportCryptService) {
 		if (this.transportCryptService.compareAndSet(null, transportCryptService)) {
 			return transportCryptService;
 		}
@@ -44,5 +47,16 @@ public class VoiceSession {
 
 	public TransportCryptServiceImpl getTransportCryptService() {
 		return this.transportCryptService.get();
+	}
+
+	public VoiceSendServiceImpl compareAndSetVoiceSendService(VoiceSendServiceImpl voiceSendService) {
+		if (this.voiceSendService.compareAndSet(null, voiceSendService)) {
+			return voiceSendService;
+		}
+		return getVoiceSendService();
+	}
+
+	public VoiceSendServiceImpl getVoiceSendService() {
+		return this.voiceSendService.get();
 	}
 }

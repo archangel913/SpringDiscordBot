@@ -73,7 +73,7 @@ public class GatewayOpcode10Service implements GatewayOpcodeServiceInterface {
 		HeartBeatService heartBeatService = heartBeatServiceProvider
 				.getHeartBeatService(sendMessageService.getSession());
 		heartBeatService.setSendMessageService(sendMessageService);
-		heartBeatService.exec(interval);
+		heartBeatService.exec(interval, "gateway");
 	}
 
 	@Override

@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.enumeration.ReconnectMode;
-import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatService;
 import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
@@ -31,9 +30,6 @@ public class GatewayOpcode7Service implements GatewayOpcodeServiceInterface {
 	public void exec(OpCodeReceiveBaseDto dto) {
 		log.info("再接続します。");
 		gatewayInfo.setReconnectMode(ReconnectMode.NORMAL);
-		HeartBeatService service = heartBeatServiceProvider
-				.getHeartBeatService(sendMessageService.getSession());
-		service.dispose();
 		heartBeatServiceProvider.removeService(sendMessageService.getSession());
 	}
 

@@ -11,6 +11,9 @@ import tokyo.archangel.sdb.discord.dto.gateway.opcode.code4.Code4Dto;
 import tokyo.archangel.sdb.discord.enumeration.ConnectingState;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
+import tokyo.archangel.sdb.discord.servicies.voice.VoiceSendService;
+import tokyo.archangel.sdb.discord.servicies.voice.VoiceSendServiceImpl;
+import tokyo.archangel.sdb.discord.servicies.voice.VoiceSessionProvider;
 import tokyo.archangel.sdb.voice.VoiceSender;
 import tools.jackson.databind.ObjectMapper;
 
@@ -22,6 +25,8 @@ import tools.jackson.databind.ObjectMapper;
 @Slf4j
 public class VoiceSenderImpl implements VoiceSender {
 	private SendMessageServiceProvider sendMessageServiceProvider;
+	
+	private VoiceSessionProvider voiceSessionProvider;
 
 	private VoiceChannels voiceChannels;
 
@@ -29,20 +34,19 @@ public class VoiceSenderImpl implements VoiceSender {
 
 	private VoiceBinaryBuffer binaryBuffer;
 
-	private VoiceSendThread sendThread;
-
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	private final static String GATEWAY = "gateway";
 
 	public VoiceSenderImpl(SendMessageServiceProvider sendMessageServiceProvider,
+			VoiceSessionProvider voiceSessionProvider,
 			VoiceChannels voiceChannels,
 			VoiceBinaryBuffer binaryBuffer,
-			VoiceSendThread sendThread) {
+			VoiceSendServiceImpl sendThread) {
 		this.voiceChannels = voiceChannels;
 		this.binaryBuffer = binaryBuffer;
 		this.sendMessageServiceProvider = sendMessageServiceProvider;
-		this.sendThread = sendThread;
+		this.voiceSessionProvider = voiceSessionProvider;
 	}
 
 	@Override
@@ -63,8 +67,7 @@ public class VoiceSenderImpl implements VoiceSender {
 		voiceInfo.getReadyFuture().join();
 
 		// 送信ループ実行
-		sendThread.init(binaryBuffer, voiceInfo);
-		sendThread.send();
+		voiceSessionProvider.getVoiceSendService(voiceInfo.getWebsocketGuid(), binaryBuffer, voiceInfo);
 		voiceInfo.setConnectingState(ConnectingState.CONNECTED);
 	}
 
@@ -75,9 +78,13 @@ public class VoiceSenderImpl implements VoiceSender {
 			log.warn("音声情報の取得に失敗しました。音声が接続されているか確認してください。");
 			return;
 		}
-		voiceInfo.setConnectingState(ConnectingState.DISCONNECTING);
 
-		sendThread.stop();
+		VoiceSendService sendService = voiceSessionProvider.getVoiceSendService(voiceInfo.getWebsocketGuid());
+		if(sendService == null) {
+			log.warn("切断対象のサービスが見つかりません");
+			return;
+		}
+		sendService.close();
 
 		// UDP切断周りの処理はVoiceServiceに集約させる
 		SendMessageService messageService = sendMessageServiceProvider.getServiceByChannelId(GATEWAY);
@@ -94,12 +101,22 @@ public class VoiceSenderImpl implements VoiceSender {
 	
 	@Override
 	public void pause() {
-		sendThread.pause();
+		VoiceSendService sendService = voiceSessionProvider.getVoiceSendService(voiceInfo.getWebsocketGuid());
+		if(sendService == null) {
+			log.warn("操作対象のサービスが見つかりません");
+			return;
+		}
+		sendService.pause();
 	}
 	
 	@Override
 	public void resume() {
-		sendThread.resume();
+		VoiceSendService sendService = voiceSessionProvider.getVoiceSendService(voiceInfo.getWebsocketGuid());
+		if(sendService == null) {
+			log.warn("操作対象のサービスが見つかりません");
+			return;
+		}
+		sendService.resume();
 	}
 
 }

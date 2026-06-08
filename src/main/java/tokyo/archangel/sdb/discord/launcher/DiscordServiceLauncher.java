@@ -24,6 +24,9 @@ public class DiscordServiceLauncher implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		// TODO 初期化処理・バリデーション
+		// 主に設定ファイルに必須項目があるか
+		
 		log.info("discordメインサービス起動開始");
 
 		// 接続URL取得
