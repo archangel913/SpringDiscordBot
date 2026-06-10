@@ -6,15 +6,10 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
 /**
  * トランスポート暗号化を行うためのクラス<br>
  * 現在aead_aes256_gcm_rtpsizeのみ対応
  */
-@Service
-@Scope("prototype")
 public class TransportCryptServiceImpl implements TransportCryptService {
 	private byte[] secretKey = null;
 	private int nonce = 0;

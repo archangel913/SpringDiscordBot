@@ -4,9 +4,7 @@ import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
@@ -20,8 +18,6 @@ import tools.jackson.databind.ObjectMapper;
 /**
  * ハートビート送信を管理するクラス
  */
-@Service
-@Scope("prototype")
 @Slf4j
 public class HeartBeatServiceImpl implements HeartBeatService {
 	private static int threadNumber = 0;

@@ -4,8 +4,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
-import org.springframework.stereotype.Service;
-
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
@@ -17,7 +15,6 @@ import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvi
 import tokyo.archangel.sdb.discord.servicies.udp.UdpServiceInterface;
 import tools.jackson.databind.ObjectMapper;
 
-@Service
 @Slf4j
 public class SelectProtcol implements UdpServiceInterface {
 

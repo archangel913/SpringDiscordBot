@@ -3,8 +3,6 @@ package tokyo.archangel.sdb;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,9 +13,7 @@ import tokyo.archangel.sdb.discord.enumeration.Intent;
  */
 @Getter
 @Setter
-@Configuration
 @ConfigurationProperties(prefix = "sdb")
-@Component
 public class ApplicationProperties {
 	/**
 	 * discordボットトークン

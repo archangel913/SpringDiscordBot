@@ -1,9 +1,7 @@
-package tokyo.archangel.sdb.discord.websocket.handler;
+package tokyo.archangel.sdb.discord.websocket;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -21,11 +19,10 @@ import tokyo.archangel.sdb.discord.servicies.gateway.GatewayService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
 
-@Component
 @Slf4j
 public class GatewayWebSocketHandler extends TextWebSocketHandler {
 	private static final String GATEWAY = "gateway";
-	
+
 	private GatewayService discordMainService;
 
 	private DiscordApi api;
@@ -35,7 +32,7 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 	private GatewayInfo gatewayInfo;
 
 	private GatewayConnectionService gatewayConnectionService;
-	
+
 	private SendMessageServiceProvider sendMessageServiceProvider;
 
 	private ApplicationContext context;
@@ -43,8 +40,10 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 	private boolean isShuttingDown = false;
 
 	public GatewayWebSocketHandler(GatewayService discordMainService, DiscordApi api, ApplicationProperties properties,
-			GatewayInfo gatewayInfo, @Lazy GatewayConnectionService gatewayConnectionService, SendMessageServiceProvider sendMessageServiceProvider,
+			GatewayInfo gatewayInfo, GatewayConnectionService gatewayConnectionService,
+			SendMessageServiceProvider sendMessageServiceProvider,
 			ApplicationContext context) {
+		// TODO ロジックをサービス側に集約する
 		this.discordMainService = discordMainService;
 		this.api = api;
 		this.properties = properties;
@@ -77,7 +76,7 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 		log.debug("gatewayWebSocket: 切断されました");
 		log.debug(String.valueOf(status.getCode()));
 		log.debug(status.getReason());
-		
+
 		sendMessageServiceProvider.removeService(session);
 
 		// シャットダウン中なら後続処理を行わない

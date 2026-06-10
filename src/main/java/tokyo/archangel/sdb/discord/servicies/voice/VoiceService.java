@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +27,6 @@ import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvi
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * 
- */
-@Service
 @Slf4j
 public class VoiceService {
 
@@ -42,7 +36,7 @@ public class VoiceService {
 
 	private HeartBeatServiceProvider heartBeatServiceProvider;
 
-	private VoiceSessionProvider voiceSessionProvider;
+	private VoiceResourceProvider voiceSessionProvider;
 
 	private VoiceChannels channels;
 
@@ -51,9 +45,9 @@ public class VoiceService {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	public VoiceService(VoiceOpcodeServiceFactory opcodeServiceFactory,
-			@Lazy VoiceConnectionService connectionService,
+			VoiceConnectionService connectionService,
 			HeartBeatServiceProvider heartBeatServiceProvider,
-			VoiceSessionProvider voiceSessionProvider, VoiceChannels channels,
+			VoiceResourceProvider voiceSessionProvider, VoiceChannels channels,
 			SendMessageServiceProvider sendMessageServiceProvider) {
 		this.opcodeServiceFactory = opcodeServiceFactory;
 		this.connectionService = connectionService;

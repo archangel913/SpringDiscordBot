@@ -1,7 +1,5 @@
-package tokyo.archangel.sdb.discord.websocket.handler;
+package tokyo.archangel.sdb.discord.websocket;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -15,8 +13,6 @@ import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
 import tokyo.archangel.sdb.discord.servicies.voice.VoiceService;
 
-@Component
-@Scope("prototype")
 @Slf4j
 public class VoiceWebSocketHandler extends TextWebSocketHandler {
 	private VoiceService discordVoiceService;

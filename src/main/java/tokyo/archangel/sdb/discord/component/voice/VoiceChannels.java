@@ -5,9 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.stereotype.Component;
 
-@Component
 public class VoiceChannels {
 	private final ObjectProvider<VoiceChannelInfo> infomation;
 
@@ -66,7 +64,7 @@ public class VoiceChannels {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * ボイスチャンネルの情報をwebsocketのguidをもとに取得します
 	 * @param sessionId

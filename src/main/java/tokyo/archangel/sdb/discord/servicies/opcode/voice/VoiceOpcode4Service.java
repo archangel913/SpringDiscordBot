@@ -2,8 +2,6 @@ package tokyo.archangel.sdb.discord.servicies.opcode.voice;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
@@ -12,9 +10,8 @@ import tokyo.archangel.sdb.discord.dto.voice.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.voice.opcode.code4.Code4Detail;
 import tokyo.archangel.sdb.discord.dto.voice.opcode.code4.Code4Dto;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
-import tokyo.archangel.sdb.discord.servicies.voice.VoiceSessionProvider;
+import tokyo.archangel.sdb.discord.servicies.voice.VoiceResourceProvider;
 
-@Service
 @Slf4j
 public class VoiceOpcode4Service implements VoiceOpcodeServiceInterface {
 
@@ -22,9 +19,9 @@ public class VoiceOpcode4Service implements VoiceOpcodeServiceInterface {
 
 	private VoiceChannels channels;
 
-	private VoiceSessionProvider voiceSessionProvider;
+	private VoiceResourceProvider voiceSessionProvider;
 
-	public VoiceOpcode4Service(VoiceChannels channels, VoiceSessionProvider voiceSessionProvider) {
+	public VoiceOpcode4Service(VoiceChannels channels, VoiceResourceProvider voiceSessionProvider) {
 		this.channels = channels;
 		this.voiceSessionProvider = voiceSessionProvider;
 	}
@@ -45,10 +42,10 @@ public class VoiceOpcode4Service implements VoiceOpcodeServiceInterface {
 		setInfo(voiceInfo, code4dto.getDetail());
 
 		// davaの初期化
-		try{
-		voiceSessionProvider.getE2eeCryptService(sendMessageService.getSession().getId(), voiceInfo.getChannelId(),
-				voiceInfo.getUserId(), voiceInfo.getSsrc(), voiceInfo);
-		}catch (Exception e) {
+		try {
+			voiceSessionProvider.getE2eeCryptService(sendMessageService.getSession().getId(), voiceInfo.getChannelId(),
+					voiceInfo.getUserId(), voiceInfo.getSsrc(), voiceInfo);
+		} catch (Exception e) {
 			log.error("E2EE暗号化サービスの初期化に失敗しました。", e);
 		}
 	}

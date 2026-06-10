@@ -7,8 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.voice.Stream;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
@@ -19,10 +17,9 @@ import tokyo.archangel.sdb.discord.dto.voice.opcode.code2.Code2Dto;
 import tokyo.archangel.sdb.discord.dto.voice.opcode.code2.Streams;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
-import tokyo.archangel.sdb.discord.servicies.voice.VoiceSessionProvider;
+import tokyo.archangel.sdb.discord.servicies.voice.VoiceResourceProvider;
 import tokyo.archangel.sdb.discord.udp.UdpConnection;
 
-@Service
 @Slf4j
 public class VoiceOpcode2Service implements VoiceOpcodeServiceInterface {
 
@@ -30,11 +27,11 @@ public class VoiceOpcode2Service implements VoiceOpcodeServiceInterface {
 
 	private SendMessageService sendMessageService;
 
-	private VoiceSessionProvider voiceSessionProvider;
+	private VoiceResourceProvider voiceSessionProvider;
 
 	private VoiceChannels channels;
 
-	public VoiceOpcode2Service(VoiceSessionProvider voiceSessionProvider,
+	public VoiceOpcode2Service(VoiceResourceProvider voiceSessionProvider,
 			SendMessageServiceProvider messageServiceProvider,
 			VoiceChannels channels) {
 		this.voiceSessionProvider = voiceSessionProvider;

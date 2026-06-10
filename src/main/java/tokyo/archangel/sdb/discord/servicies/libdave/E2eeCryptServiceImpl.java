@@ -2,9 +2,6 @@ package tokyo.archangel.sdb.discord.servicies.libdave;
 
 import java.util.List;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
@@ -18,8 +15,6 @@ import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 /**
  * E2EE暗号化を行うためのクラス
  */
-@Service
-@Scope("prototype")
 public class E2eeCryptServiceImpl implements E2eeCryptService {
 	Pointer session;
 

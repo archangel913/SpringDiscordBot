@@ -1,7 +1,5 @@
 package tokyo.archangel.sdb.discord.servicies.opcode.voice;
 
-import org.springframework.stereotype.Service;
-
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
@@ -12,7 +10,6 @@ import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
 
-@Service
 @Slf4j
 public class VoiceOpcode8Service implements VoiceOpcodeServiceInterface {
 

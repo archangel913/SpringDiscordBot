@@ -1,7 +1,5 @@
 package tokyo.archangel.sdb.discord.servicies.gateway;
 
-import org.springframework.stereotype.Service;
-
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
@@ -13,10 +11,6 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.exc.JsonNodeException;
 
-/**
- * 
- */
-@Service
 @Slf4j
 public class GatewayService {
 

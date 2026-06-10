@@ -4,8 +4,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
 import jakarta.annotation.PreDestroy;
@@ -14,13 +12,15 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * ハートビート送信サービスを提供するプロバイダー
  */
-@Service
 @Slf4j
 public class HeartBeatServiceProvider {
-	@Autowired
 	private ObjectProvider<HeartBeatServiceImpl> serviceProvider;
 
 	private ConcurrentMap<String, HeartBeatServiceImpl> heartBeatServices = new ConcurrentHashMap<>();
+
+	public HeartBeatServiceProvider(ObjectProvider<HeartBeatServiceImpl> serviceProvider) {
+		this.serviceProvider = serviceProvider;
+	}
 
 	/**
 	 * ハートビート送信サービスを取得する

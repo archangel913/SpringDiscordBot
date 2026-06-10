@@ -5,9 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.CompletableFuture;
 
-import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
@@ -19,13 +17,11 @@ import tokyo.archangel.sdb.discord.servicies.transportcrypter.TransportCryptServ
 import tokyo.archangel.sdb.discord.udp.UdpConnection;
 import tokyo.archangel.sdb.discord.voice.VoiceBinaryBuffer;
 
-@Component
-@Scope("prototype")
 @Slf4j
 public class VoiceSendServiceImpl implements VoiceSendService {
 	private static int threadNumber = 0;
 
-	private VoiceSessionProvider voiceSessionProvider;
+	private VoiceResourceProvider voiceSessionProvider;
 
 	private OpusEncodeService opusEncoder;
 
@@ -45,7 +41,7 @@ public class VoiceSendServiceImpl implements VoiceSendService {
 
 	private volatile ServiceThreadStatus status = ServiceThreadStatus.INITIALIZING;
 
-	public VoiceSendServiceImpl(VoiceSessionProvider voiceSessionProvider,
+	public VoiceSendServiceImpl(VoiceResourceProvider voiceSessionProvider,
 			OpusEncodeService opusEncoder) {
 		this.voiceSessionProvider = voiceSessionProvider;
 		this.opusEncoder = opusEncoder;

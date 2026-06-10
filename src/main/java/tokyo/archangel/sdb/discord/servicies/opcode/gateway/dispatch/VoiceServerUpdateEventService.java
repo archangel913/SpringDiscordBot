@@ -1,7 +1,5 @@
 package tokyo.archangel.sdb.discord.servicies.opcode.gateway.dispatch;
 
-import org.springframework.stereotype.Service;
-
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.Code0Dto;
@@ -10,7 +8,6 @@ import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcodeService
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.voice.VoiceConnectionService;
 
-@Service
 @Slf4j
 public class VoiceServerUpdateEventService implements GatewayOpcodeServiceInterface {
 	private VoiceConnectionService voiceConnectionService;

@@ -3,7 +3,6 @@ package tokyo.archangel.sdb.discord.servicies.voice;
 import java.io.IOException;
 import java.util.Objects;
 
-import org.springframework.stereotype.Service;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
@@ -17,10 +16,9 @@ import tokyo.archangel.sdb.discord.dto.voice.opcode.code7.Code7Detail;
 import tokyo.archangel.sdb.discord.dto.voice.opcode.code7.Code7Dto;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
-import tokyo.archangel.sdb.discord.websocket.handler.VoiceWebSocketHandler;
+import tokyo.archangel.sdb.discord.websocket.VoiceWebSocketHandler;
 import tools.jackson.databind.ObjectMapper;
 
-@Service
 @Slf4j
 public class VoiceConnectionService {
 	// TODO 接続失敗時の処理が抜けてる

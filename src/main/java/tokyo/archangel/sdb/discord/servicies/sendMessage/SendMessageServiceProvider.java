@@ -5,7 +5,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
 import jakarta.annotation.PreDestroy;
@@ -15,7 +14,6 @@ import tokyo.archangel.sdb.ApplicationProperties;
 /**
  * メッセージ送信用サービスを提供するクラス
  */
-@Service
 @Slf4j
 public class SendMessageServiceProvider {
 	private final ObjectProvider<SendMessageServiceImpl> serviceProvider;

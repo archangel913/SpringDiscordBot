@@ -1,8 +1,5 @@
 package tokyo.archangel.sdb.discord.voice;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
@@ -11,22 +8,17 @@ import tokyo.archangel.sdb.discord.dto.gateway.opcode.code4.Code4Dto;
 import tokyo.archangel.sdb.discord.enumeration.ConnectingState;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
+import tokyo.archangel.sdb.discord.servicies.voice.VoiceResourceProvider;
 import tokyo.archangel.sdb.discord.servicies.voice.VoiceSendService;
 import tokyo.archangel.sdb.discord.servicies.voice.VoiceSendServiceImpl;
-import tokyo.archangel.sdb.discord.servicies.voice.VoiceSessionProvider;
 import tokyo.archangel.sdb.voice.VoiceSender;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * 
- */
-@Service
-@Scope("prototype")
 @Slf4j
 public class VoiceSenderImpl implements VoiceSender {
 	private SendMessageServiceProvider sendMessageServiceProvider;
 	
-	private VoiceSessionProvider voiceSessionProvider;
+	private VoiceResourceProvider voiceSessionProvider;
 
 	private VoiceChannels voiceChannels;
 
@@ -39,7 +31,7 @@ public class VoiceSenderImpl implements VoiceSender {
 	private final static String GATEWAY = "gateway";
 
 	public VoiceSenderImpl(SendMessageServiceProvider sendMessageServiceProvider,
-			VoiceSessionProvider voiceSessionProvider,
+			VoiceResourceProvider voiceSessionProvider,
 			VoiceChannels voiceChannels,
 			VoiceBinaryBuffer binaryBuffer,
 			VoiceSendServiceImpl sendThread) {

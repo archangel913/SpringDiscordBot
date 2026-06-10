@@ -2,14 +2,12 @@ package tokyo.archangel.sdb.discord.servicies.gateway;
 
 import java.util.Objects;
 
-import org.springframework.stereotype.Service;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.discord.websocket.handler.GatewayWebSocketHandler;
+import tokyo.archangel.sdb.discord.websocket.GatewayWebSocketHandler;
 
-@Service
 @Slf4j
 public class GatewayConnectionService {
 	private GatewayWebSocketHandler discordWebSocketHandler;

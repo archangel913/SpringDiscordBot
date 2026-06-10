@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.ApplicationProperties;
@@ -16,7 +15,6 @@ import tokyo.archangel.sdb.discord.servicies.gateway.GatewayConnectionService;
 /**
  * ディスコードのメインサービスを発火させるクラス
  */
-@Component
 @Slf4j
 public class DiscordServiceLauncher implements CommandLineRunner {
 	private static final int MINIMUM_WEBSOCKET_MESSAGE_SIZE_LIMIT = 500;
@@ -25,7 +23,7 @@ public class DiscordServiceLauncher implements CommandLineRunner {
 	private GatewayConnectionService gatewayConnectionService;
 
 	private ApplicationProperties properties;
-	
+
 	private ApplicationContext context;
 
 	public DiscordServiceLauncher(GatewayConnectionService gatewayConnectionService, DiscordApi api,

@@ -5,9 +5,7 @@ import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -21,8 +19,6 @@ import tokyo.archangel.sdb.discord.enumeration.ServiceThreadStatus;
  * メッセージの送信とレート制限を管理するサービス<br>
  * こちらからの切断もこのクラスから行う
  */
-@Service
-@Scope("prototype")
 @Slf4j
 public class SendMessageServiceImpl implements SendMessageService {
 	private static int threadNumber = 0;

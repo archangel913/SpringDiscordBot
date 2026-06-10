@@ -7,8 +7,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
-import org.springframework.stereotype.Service;
-
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.servicies.udp.UdpServiceFactory;
 import tokyo.archangel.sdb.discord.servicies.udp.UdpServiceInterface;
@@ -18,7 +16,6 @@ import tokyo.archangel.sdb.discord.servicies.udp.selectprotcol.SelectProtcol;
  * UDPから受信したデータをパースし、各サービスクラスに振り分ける
  * @author archangel
  */
-@Service
 @Slf4j
 public class UdpService {
 

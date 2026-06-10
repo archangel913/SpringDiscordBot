@@ -3,8 +3,6 @@ package tokyo.archangel.sdb.discord.servicies.opcode.gateway.dispatch;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-import org.springframework.stereotype.Service;
-
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
@@ -14,7 +12,6 @@ import tokyo.archangel.sdb.discord.dto.gateway.opcode.code0.voicechannelstarttim
 import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcodeServiceInterface;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
-@Service
 @Slf4j
 public class VoiceChannelStartTimeUpdateService implements GatewayOpcodeServiceInterface{
 	

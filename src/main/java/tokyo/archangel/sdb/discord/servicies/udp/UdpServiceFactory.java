@@ -2,16 +2,13 @@ package tokyo.archangel.sdb.discord.servicies.udp;
 
 import java.util.Map;
 
-import org.springframework.stereotype.Component;
-
 /**
  * UDP経由で送られてきたデータを処理できる専用のサービスを生成するクラス
  * @author archangel
  */
-@Component
 public class UdpServiceFactory {
 	private Map<String, UdpServiceInterface> udpServiceInterface;
-	
+
 	public UdpServiceFactory(Map<String, UdpServiceInterface> udpServiceInterface) {
 		this.udpServiceInterface = udpServiceInterface;
 	}
@@ -23,6 +20,6 @@ public class UdpServiceFactory {
 	 * @return
 	 */
 	public UdpServiceInterface create(String className) {
-		return  udpServiceInterface.get(className);
+		return udpServiceInterface.get(className);
 	}
 }

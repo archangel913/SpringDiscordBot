@@ -11,9 +11,7 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
-import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +21,6 @@ import tokyo.archangel.sdb.discord.enumeration.ServiceThreadStatus;
  * UDPコネクションの実装クラス
  * @author archangel
  */
-@Component
-@Scope("prototype")
 @Slf4j
 public class UdpConnectionImpl implements UdpConnection {
 	private static int threadNumber = 0;

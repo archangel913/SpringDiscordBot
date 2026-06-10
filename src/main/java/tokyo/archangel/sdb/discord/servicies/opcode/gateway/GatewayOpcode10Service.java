@@ -3,7 +3,6 @@ package tokyo.archangel.sdb.discord.servicies.opcode.gateway;
 import java.util.List;
 
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.ApplicationProperties;
@@ -26,7 +25,6 @@ import tools.jackson.databind.ObjectMapper;
 /**
  * gatewayからopcode10を受け取った時に実行するサービス
  */
-@Service
 @Slf4j
 public class GatewayOpcode10Service implements GatewayOpcodeServiceInterface {
 	private HeartBeatServiceProvider heartBeatServiceProvider;

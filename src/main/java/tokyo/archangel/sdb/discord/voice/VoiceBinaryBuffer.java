@@ -1,12 +1,7 @@
 package tokyo.archangel.sdb.discord.voice;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import lombok.extern.slf4j.Slf4j;
 
-@Component
-@Scope("prototype")
 @Slf4j
 public class VoiceBinaryBuffer {
 
@@ -93,7 +88,7 @@ public class VoiceBinaryBuffer {
 
 		return frameData;
 	}
-	
+
 	public synchronized int size() {
 		return size;
 	}

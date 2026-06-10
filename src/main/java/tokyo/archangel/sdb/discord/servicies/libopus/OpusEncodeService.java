@@ -1,11 +1,8 @@
 package tokyo.archangel.sdb.discord.servicies.libopus;
 
-import org.springframework.stereotype.Service;
-
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 
-@Service
 public class OpusEncodeService {
 	private final Pointer encoder;
 	private static final int OPUS_APPLICATION_AUDIO = 2049;

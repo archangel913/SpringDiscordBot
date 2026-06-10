@@ -1,7 +1,5 @@
 package tokyo.archangel.sdb.discord.servicies.opcode.voice;
 
-import org.springframework.stereotype.Service;
-
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
@@ -9,18 +7,17 @@ import tokyo.archangel.sdb.discord.dto.voice.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.discord.dto.voice.opcode.code11.Code11Dto;
 import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageService;
 
-@Service
 @Slf4j
 public class VoiceOpcode11Service implements VoiceOpcodeServiceInterface {
 
 	private SendMessageService sendMessageService;
-	
+
 	VoiceChannels channels;
-	
+
 	public VoiceOpcode11Service(VoiceChannels channels) {
 		this.channels = channels;
 	}
-	
+
 	@Override
 	public void exec(OpCodeReceiveBaseDto dto) {
 		log.debug("voiceのOPコード11を受信しました。");
@@ -31,7 +28,7 @@ public class VoiceOpcode11Service implements VoiceOpcodeServiceInterface {
 			log.warn("必要なデータが揃っていないため処理を実行しません");
 			return;
 		}
-		
+
 		VoiceChannelInfo info = channels.getInfoByWebsocketGuid(sendMessageService.getSession().getId());
 		info.getJoinedUserIds().addAll(code11dto.getDetail().getUserIds());
 	}

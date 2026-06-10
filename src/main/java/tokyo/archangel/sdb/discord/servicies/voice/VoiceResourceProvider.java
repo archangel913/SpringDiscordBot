@@ -4,7 +4,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +16,8 @@ import tokyo.archangel.sdb.discord.udp.UdpConnection;
 import tokyo.archangel.sdb.discord.udp.UdpConnectionImpl;
 import tokyo.archangel.sdb.discord.voice.VoiceBinaryBuffer;
 
-@Service
 @Slf4j
-public class VoiceSessionProvider {
+public class VoiceResourceProvider {
 	private final ObjectProvider<UdpConnectionImpl> udpConnectionProvider;
 
 	private final ObjectProvider<E2eeCryptServiceImpl> e2eeCryptServiceProvider;
@@ -30,7 +28,7 @@ public class VoiceSessionProvider {
 
 	private final ConcurrentMap<String, VoiceSession> voiceSessionServices = new ConcurrentHashMap<>();
 
-	public VoiceSessionProvider(ObjectProvider<UdpConnectionImpl> udpConnectionProvider,
+	public VoiceResourceProvider(ObjectProvider<UdpConnectionImpl> udpConnectionProvider,
 			ObjectProvider<E2eeCryptServiceImpl> e2eeCryptServiceProvider,
 			ObjectProvider<TransportCryptServiceImpl> transportCryptServiceProvider,
 			ObjectProvider<VoiceSendServiceImpl> voiceSendServiceProvider) {

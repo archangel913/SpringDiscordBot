@@ -6,26 +6,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import lombok.Data;
 import tokyo.archangel.sdb.discord.enumeration.ConnectingState;
 
 @Data
-@Component
-@Scope("prototype")
 public class VoiceChannelInfo {
 	/**
 	 * 音声websoketの接続先
 	 */
 	private String endpoint;
-	
+
 	/**
 	 * ハートビート送信の間隔
 	 */
 	private int heartBeatInterval;
-	
+
 	/**
 	 * チャンネルID
 	 */
@@ -66,7 +61,7 @@ public class VoiceChannelInfo {
 	 * ssrc
 	 */
 	private Integer ssrc;
-	
+
 	/**
 	 * 音声接続に使用するトークン
 	 */
@@ -81,17 +76,17 @@ public class VoiceChannelInfo {
 	 * websocketのGUID
 	 */
 	private String websocketGuid;
-	
+
 	/**
 	 * 再接続前のwebsocketのGUID
 	 */
 	private String oldWebsocketGuid;
-	
+
 	/**
 	 * マイクミュートか
 	 */
 	private boolean mute;
-	
+
 	/**
 	 * スピーカーミュートか
 	 */
@@ -106,12 +101,12 @@ public class VoiceChannelInfo {
 	 * 音声送信準備が整ったか
 	 */
 	private CompletableFuture<Void> readyFuture = new CompletableFuture<Void>();
-	
+
 	/**
 	 * 接続状態
 	 */
 	private ConnectingState connectingState = ConnectingState.CONNECTING;
-	
+
 	/**
 	 * 再接続を何回したか
 	 */
