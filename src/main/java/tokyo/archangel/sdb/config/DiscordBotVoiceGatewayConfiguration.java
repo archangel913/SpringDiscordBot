@@ -4,18 +4,18 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
-import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
-import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcode11Service;
-import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcode13Service;
-import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcode22Service;
-import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcode2Service;
-import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcode3Service;
-import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcode4Service;
-import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcode8Service;
-import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcode9Service;
-import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
-import tokyo.archangel.sdb.discord.servicies.voice.VoiceResourceProvider;
+import tokyo.archangel.sdb.internal.component.voice.VoiceChannels;
+import tokyo.archangel.sdb.internal.servicies.heartbeat.HeartBeatServiceProvider;
+import tokyo.archangel.sdb.internal.servicies.opcode.voice.VoiceOpcode11Service;
+import tokyo.archangel.sdb.internal.servicies.opcode.voice.VoiceOpcode13Service;
+import tokyo.archangel.sdb.internal.servicies.opcode.voice.VoiceOpcode22Service;
+import tokyo.archangel.sdb.internal.servicies.opcode.voice.VoiceOpcode2Service;
+import tokyo.archangel.sdb.internal.servicies.opcode.voice.VoiceOpcode3Service;
+import tokyo.archangel.sdb.internal.servicies.opcode.voice.VoiceOpcode4Service;
+import tokyo.archangel.sdb.internal.servicies.opcode.voice.VoiceOpcode8Service;
+import tokyo.archangel.sdb.internal.servicies.opcode.voice.VoiceOpcode9Service;
+import tokyo.archangel.sdb.internal.servicies.sendMessage.SendMessageServiceProvider;
+import tokyo.archangel.sdb.internal.servicies.voice.VoiceResourceProvider;
 import tools.jackson.databind.ObjectMapper;
 
 @Configuration

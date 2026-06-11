@@ -1,0 +1,50 @@
+package tokyo.archangel.sdb.internal.dto.gateway.opcode.code0;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import lombok.EqualsAndHashCode;
+import lombok.Value;
+import tokyo.archangel.sdb.internal.dto.NotImplementCodeDto;
+import tokyo.archangel.sdb.internal.dto.TargetServiceNameObtainable;
+import tokyo.archangel.sdb.internal.dto.gateway.OpCodeReceiveBaseDto;
+import tokyo.archangel.sdb.internal.dto.gateway.opcode.code0.ready.ReadyDetail;
+import tokyo.archangel.sdb.internal.dto.gateway.opcode.code0.voicechannelstarttimeupdate.VoiceChannelStartTimeUpdateDetail;
+import tokyo.archangel.sdb.internal.dto.gateway.opcode.code0.voicechannelstatusupdate.VoiceChannelStatusUpdateDetail;
+import tokyo.archangel.sdb.internal.dto.gateway.opcode.code0.voiceserverupdate.VoiceServerUpdateDetail;
+import tokyo.archangel.sdb.internal.dto.gateway.opcode.code0.voicestateupdate.VoiceStateUpdateDetail;
+import tokyo.archangel.sdb.internal.enumeration.DispatchEvent;
+import tokyo.archangel.sdb.internal.enumeration.GatewayOpCode;
+
+@Value
+@EqualsAndHashCode(callSuper = true)
+public class Code0Dto extends OpCodeReceiveBaseDto {
+
+	@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "t", visible = true, defaultImpl = NotImplementCodeDto.class)
+	@JsonSubTypes({
+			@JsonSubTypes.Type(value = ReadyDetail.class, name = "READY"),
+			@JsonSubTypes.Type(value = VoiceServerUpdateDetail.class, name = "VOICE_SERVER_UPDATE"),
+			@JsonSubTypes.Type(value = VoiceStateUpdateDetail.class, name = "VOICE_STATE_UPDATE"),
+			@JsonSubTypes.Type(value = VoiceChannelStartTimeUpdateDetail.class, name = "VOICE_CHANNEL_START_TIME_UPDATE"),
+			@JsonSubTypes.Type(value = VoiceChannelStatusUpdateDetail.class, name = "VOICE_CHANNEL_STATUS_UPDATE"),
+	})
+	@JsonProperty("d")
+	private EventDetailBase detail;
+
+	public Code0Dto(
+			@JsonProperty("t") DispatchEvent event,
+			@JsonProperty("d") EventDetailBase detail,
+			@JsonProperty("s") Long sequence) {
+		super(GatewayOpCode.DISPATCH, event, sequence);
+		this.detail = detail;
+	}
+
+	@JsonIgnore
+	@Override
+	public String getServiceClassName() {
+		return ((TargetServiceNameObtainable) detail).getServiceClassName();
+	}
+
+}

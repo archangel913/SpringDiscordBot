@@ -5,21 +5,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
-import tokyo.archangel.sdb.ApplicationProperties;
-import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
-import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
-import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcode10Service;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcode11Service;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcode1Service;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcode7Service;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcode9Service;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.dispatch.ReadyEventService;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.dispatch.VoiceChannelStartTimeUpdateService;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.dispatch.VoiceChannelStatusUpdateService;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.dispatch.VoiceServerUpdateEventService;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.dispatch.VoiceStateUpdateService;
-import tokyo.archangel.sdb.discord.servicies.voice.VoiceConnectionService;
+import tokyo.archangel.sdb.internal.component.gateway.GatewayInfo;
+import tokyo.archangel.sdb.internal.component.voice.VoiceChannels;
+import tokyo.archangel.sdb.internal.servicies.heartbeat.HeartBeatServiceProvider;
+import tokyo.archangel.sdb.internal.servicies.opcode.gateway.GatewayOpcode10Service;
+import tokyo.archangel.sdb.internal.servicies.opcode.gateway.GatewayOpcode11Service;
+import tokyo.archangel.sdb.internal.servicies.opcode.gateway.GatewayOpcode1Service;
+import tokyo.archangel.sdb.internal.servicies.opcode.gateway.GatewayOpcode7Service;
+import tokyo.archangel.sdb.internal.servicies.opcode.gateway.GatewayOpcode9Service;
+import tokyo.archangel.sdb.internal.servicies.opcode.gateway.dispatch.ReadyEventService;
+import tokyo.archangel.sdb.internal.servicies.opcode.gateway.dispatch.VoiceChannelStartTimeUpdateService;
+import tokyo.archangel.sdb.internal.servicies.opcode.gateway.dispatch.VoiceChannelStatusUpdateService;
+import tokyo.archangel.sdb.internal.servicies.opcode.gateway.dispatch.VoiceServerUpdateEventService;
+import tokyo.archangel.sdb.internal.servicies.opcode.gateway.dispatch.VoiceStateUpdateService;
+import tokyo.archangel.sdb.internal.servicies.voice.VoiceConnectionService;
 import tools.jackson.databind.ObjectMapper;
 
 @Configuration

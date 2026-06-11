@@ -11,43 +11,44 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.socket.WebSocketSession;
 
-import tokyo.archangel.sdb.ApplicationProperties;
-import tokyo.archangel.sdb.discord.api.DiscordApi;
-import tokyo.archangel.sdb.discord.component.gateway.GatewayInfo;
-import tokyo.archangel.sdb.discord.component.voice.VoiceChannelInfo;
-import tokyo.archangel.sdb.discord.component.voice.VoiceChannels;
-import tokyo.archangel.sdb.discord.launcher.DiscordServiceLauncher;
-import tokyo.archangel.sdb.discord.servicies.gateway.GatewayConnectionService;
-import tokyo.archangel.sdb.discord.servicies.gateway.GatewayService;
-import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceImpl;
-import tokyo.archangel.sdb.discord.servicies.heartbeat.HeartBeatServiceProvider;
-import tokyo.archangel.sdb.discord.servicies.libdave.E2eeCryptServiceImpl;
-import tokyo.archangel.sdb.discord.servicies.libopus.OpusEncodeService;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcodeServiceFactory;
-import tokyo.archangel.sdb.discord.servicies.opcode.gateway.GatewayOpcodeServiceInterface;
-import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcodeServiceFactory;
-import tokyo.archangel.sdb.discord.servicies.opcode.voice.VoiceOpcodeServiceInterface;
-import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceImpl;
-import tokyo.archangel.sdb.discord.servicies.sendMessage.SendMessageServiceProvider;
-import tokyo.archangel.sdb.discord.servicies.transportcrypter.TransportCryptServiceImpl;
-import tokyo.archangel.sdb.discord.servicies.udp.UdpServiceFactory;
-import tokyo.archangel.sdb.discord.servicies.udp.UdpServiceInterface;
-import tokyo.archangel.sdb.discord.servicies.voice.VoiceConnectionService;
-import tokyo.archangel.sdb.discord.servicies.voice.VoiceResourceProvider;
-import tokyo.archangel.sdb.discord.servicies.voice.VoiceSendServiceImpl;
-import tokyo.archangel.sdb.discord.servicies.voice.VoiceService;
-import tokyo.archangel.sdb.discord.udp.UdpConnectionImpl;
-import tokyo.archangel.sdb.discord.udp.UdpService;
-import tokyo.archangel.sdb.discord.voice.VoiceBinaryBuffer;
-import tokyo.archangel.sdb.discord.voice.VoiceSenderImpl;
-import tokyo.archangel.sdb.discord.websocket.GatewayWebSocketHandler;
-import tokyo.archangel.sdb.discord.websocket.VoiceWebSocketHandler;
+import tokyo.archangel.sdb.internal.api.DiscordApi;
+import tokyo.archangel.sdb.internal.component.gateway.GatewayInfo;
+import tokyo.archangel.sdb.internal.component.voice.VoiceChannelInfo;
+import tokyo.archangel.sdb.internal.component.voice.VoiceChannels;
+import tokyo.archangel.sdb.internal.launcher.DiscordServiceLauncher;
+import tokyo.archangel.sdb.internal.servicies.gateway.GatewayConnectionService;
+import tokyo.archangel.sdb.internal.servicies.gateway.GatewayService;
+import tokyo.archangel.sdb.internal.servicies.heartbeat.HeartBeatServiceImpl;
+import tokyo.archangel.sdb.internal.servicies.heartbeat.HeartBeatServiceProvider;
+import tokyo.archangel.sdb.internal.servicies.libdave.E2eeCryptServiceImpl;
+import tokyo.archangel.sdb.internal.servicies.libopus.OpusEncodeService;
+import tokyo.archangel.sdb.internal.servicies.opcode.gateway.GatewayOpcodeServiceFactory;
+import tokyo.archangel.sdb.internal.servicies.opcode.gateway.GatewayOpcodeServiceInterface;
+import tokyo.archangel.sdb.internal.servicies.opcode.voice.VoiceOpcodeServiceFactory;
+import tokyo.archangel.sdb.internal.servicies.opcode.voice.VoiceOpcodeServiceInterface;
+import tokyo.archangel.sdb.internal.servicies.sendMessage.SendMessageServiceImpl;
+import tokyo.archangel.sdb.internal.servicies.sendMessage.SendMessageServiceProvider;
+import tokyo.archangel.sdb.internal.servicies.transportcrypter.TransportCryptServiceImpl;
+import tokyo.archangel.sdb.internal.servicies.udp.UdpServiceFactory;
+import tokyo.archangel.sdb.internal.servicies.udp.UdpServiceInterface;
+import tokyo.archangel.sdb.internal.servicies.voice.VoiceConnectionService;
+import tokyo.archangel.sdb.internal.servicies.voice.VoiceResourceProvider;
+import tokyo.archangel.sdb.internal.servicies.voice.VoiceSendServiceImpl;
+import tokyo.archangel.sdb.internal.servicies.voice.VoiceService;
+import tokyo.archangel.sdb.internal.udp.UdpConnectionImpl;
+import tokyo.archangel.sdb.internal.udp.UdpService;
+import tokyo.archangel.sdb.internal.voice.VoiceBinaryBuffer;
+import tokyo.archangel.sdb.internal.voice.VoiceSenderImpl;
+import tokyo.archangel.sdb.internal.websocket.GatewayWebSocketHandler;
+import tokyo.archangel.sdb.internal.websocket.VoiceWebSocketHandler;
 import tools.jackson.databind.ObjectMapper;
 
 @Configuration
+@EnableAsync
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import({
 		DiscordBotGatewayConfiguration.class,
