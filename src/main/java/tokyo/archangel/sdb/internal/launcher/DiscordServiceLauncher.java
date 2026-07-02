@@ -2,7 +2,8 @@ package tokyo.archangel.sdb.internal.launcher;
 
 import java.util.List;
 
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 
@@ -16,7 +17,7 @@ import tokyo.archangel.sdb.internal.servicies.gateway.GatewayConnectionService;
  * ディスコードのメインサービスを発火させるクラス
  */
 @Slf4j
-public class DiscordServiceLauncher implements CommandLineRunner {
+public class DiscordServiceLauncher implements ApplicationRunner {
 	private static final int MINIMUM_WEBSOCKET_MESSAGE_SIZE_LIMIT = 500;
 	private DiscordApi api;
 
@@ -35,7 +36,7 @@ public class DiscordServiceLauncher implements CommandLineRunner {
 	}
 
 	@Override
-	public void run(String... args) throws Exception {
+	public void run(ApplicationArguments args) throws Exception {
 		try {
 			validate();
 		} catch (Exception e) {
