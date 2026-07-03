@@ -12,7 +12,7 @@ import com.sun.jna.ptr.PointerByReference;
  * E2EE暗号化ライブラリlibdaveを使用するためのインターフェース
  */
 public interface LibDave extends Library {
-	LibDave INSTANCE = Native.load("libdave", LibDave.class);
+	LibDave INSTANCE = Native.load("dave", LibDave.class);
 	
 	// ==========================================
 	// 定数定義
