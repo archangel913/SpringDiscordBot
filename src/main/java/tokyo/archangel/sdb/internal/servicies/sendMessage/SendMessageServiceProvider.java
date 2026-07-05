@@ -108,7 +108,8 @@ public class SendMessageServiceProvider {
 	 * @param session
 	 */
 	public void removeService(WebSocketSession session) {
-		sendMessageServices.remove(session.getId());
+		SendMessageServiceImpl service = sendMessageServices.remove(session.getId());
+		service.close();
 		log.debug("ハートビートサービスを削除しました。現在有効なサービスは" + sendMessageServices.size() + "個です");
 	}
 

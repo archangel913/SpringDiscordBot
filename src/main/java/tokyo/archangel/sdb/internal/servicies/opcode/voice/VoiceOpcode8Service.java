@@ -45,7 +45,7 @@ public class VoiceOpcode8Service implements VoiceOpcodeServiceInterface {
 
 		HeartBeatService heartBeatService = heartBeatServiceProvider
 				.getHeartBeatService(sendMessageService.getSession());
-		heartBeatService.setSendMessageService(sendMessageService);
+		heartBeatService.setSendMessageService(sendMessageService.getSession());
 		heartBeatService.setVoiceChannelInfo(voiceInfo);
 		heartBeatService.exec(voiceInfo.getHeartBeatInterval(), voiceInfo.getChannelId());
 	}

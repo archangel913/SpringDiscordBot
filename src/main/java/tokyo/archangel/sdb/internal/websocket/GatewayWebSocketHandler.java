@@ -78,7 +78,7 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 		log.debug(String.valueOf(status.getCode()));
 		log.debug(status.getReason());
 
-		sendMessageServiceProvider.removeService(session);
+		discordMainService.close(session);
 
 		// シャットダウン中なら後続処理を行わない
 		if (isShuttingDown) {

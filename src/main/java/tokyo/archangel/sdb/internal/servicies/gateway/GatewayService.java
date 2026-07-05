@@ -1,8 +1,11 @@
 package tokyo.archangel.sdb.internal.servicies.gateway;
 
+import org.springframework.web.socket.WebSocketSession;
+
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.internal.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.internal.dto.gateway.OpCodeReceiveBaseDto;
+import tokyo.archangel.sdb.internal.servicies.heartbeat.HeartBeatServiceProvider;
 import tokyo.archangel.sdb.internal.servicies.opcode.gateway.GatewayOpcodeServiceFactory;
 import tokyo.archangel.sdb.internal.servicies.opcode.gateway.GatewayOpcodeServiceInterface;
 import tokyo.archangel.sdb.internal.servicies.sendMessage.SendMessageService;
@@ -17,6 +20,8 @@ public class GatewayService {
 	private GatewayOpcodeServiceFactory opcodeServiceFactory;
 
 	private GatewayInfo gatewayInfo;
+
+	private HeartBeatServiceProvider heartbeatServiceProvider;
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -55,5 +60,9 @@ public class GatewayService {
 			return;
 		}
 		service.exec(baseDto);
+	}
+
+	public void close(WebSocketSession session) {
+		heartbeatServiceProvider.removeService(session);
 	}
 }

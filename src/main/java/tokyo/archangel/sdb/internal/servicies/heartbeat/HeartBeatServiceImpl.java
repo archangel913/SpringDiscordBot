@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.internal.component.gateway.GatewayInfo;
@@ -13,6 +14,7 @@ import tokyo.archangel.sdb.internal.dto.gateway.opcode.code1.Code1SendDto;
 import tokyo.archangel.sdb.internal.dto.voice.opcode.code3.Code3ReceiveDto;
 import tokyo.archangel.sdb.internal.enumeration.ServiceThreadStatus;
 import tokyo.archangel.sdb.internal.servicies.sendMessage.SendMessageService;
+import tokyo.archangel.sdb.internal.servicies.sendMessage.SendMessageServiceProvider;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -30,7 +32,7 @@ public class HeartBeatServiceImpl implements HeartBeatService {
 
 	private GatewayInfo gatewayInfo;
 
-	private SendMessageService sendMessageService;
+	private SendMessageServiceProvider sendMessageServiceProvider;
 
 	// 音声gateway用
 	private VoiceChannelInfo voiceChannelInfo;
@@ -39,8 +41,11 @@ public class HeartBeatServiceImpl implements HeartBeatService {
 
 	private Thread currentThread;
 
-	public HeartBeatServiceImpl(GatewayInfo gatewayInfo) {
+	private WebSocketSession session;
+
+	public HeartBeatServiceImpl(GatewayInfo gatewayInfo, SendMessageServiceProvider sendMessageServiceProvider) {
 		this.gatewayInfo = gatewayInfo;
+		this.sendMessageServiceProvider = sendMessageServiceProvider;
 	}
 
 	@Override
@@ -49,8 +54,8 @@ public class HeartBeatServiceImpl implements HeartBeatService {
 	}
 
 	@Override
-	public void setSendMessageService(SendMessageService sendMessageService) {
-		this.sendMessageService = sendMessageService;
+	public void setSendMessageService(WebSocketSession session) {
+		this.session = session;
 	}
 
 	@Async
@@ -111,7 +116,8 @@ public class HeartBeatServiceImpl implements HeartBeatService {
 
 	@Override
 	public void sendHeartBeat(String json) {
-		sendMessageService.sendMessage(json);
+		SendMessageService messageService = sendMessageServiceProvider.generateSendMessageService(session);
+		messageService.sendMessage(json);
 	}
 
 	@Override
@@ -134,10 +140,12 @@ public class HeartBeatServiceImpl implements HeartBeatService {
 	}
 
 	private void shutdown() throws IllegalStateException {
-		if (sendMessageService == null) {
+		if (session == null) {
 			throw new IllegalStateException("メッセージ送信メソッドがnullです。");
 		}
-		sendMessageService.close();
+
+		sendMessageServiceProvider.removeService(session);
+
 		log.debug("ハートビートスレッドが終了しました。");
 		// すべてのクリーンアップが完了したため、最終ステータスに固定
 		status = ServiceThreadStatus.TERMINATED;

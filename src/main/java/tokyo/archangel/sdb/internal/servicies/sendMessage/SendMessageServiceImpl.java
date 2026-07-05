@@ -142,9 +142,11 @@ public class SendMessageServiceImpl implements SendMessageService {
 
 	private void shutdown() {
 		try {
-			log.debug("websocketを切断します");
-			session.close();
-			log.info("discordから切断完了。");
+			if (session.isOpen()) {
+				log.debug("websocketを切断します");
+				session.close();
+				log.info("discordから切断完了。");
+			}
 		} catch (IOException e) {
 			log.error("discordの切断中にエラーが発生しました。", e);
 		}
