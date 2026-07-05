@@ -1,4 +1,4 @@
-package tokyo.archangel.sdb.config;
+package tokyo.archangel.sdb.internal.config;
 
 import java.util.List;
 

@@ -1,14 +1,15 @@
 package tokyo.archangel.sdb.internal.websocket;
 
+import jakarta.annotation.PreDestroy;
+
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.config.ApplicationProperties;
+import tokyo.archangel.sdb.internal.config.ApplicationProperties;
 import tokyo.archangel.sdb.internal.servicies.sendMessage.SendMessageService;
 import tokyo.archangel.sdb.internal.servicies.sendMessage.SendMessageServiceProvider;
 import tokyo.archangel.sdb.internal.servicies.voice.VoiceService;

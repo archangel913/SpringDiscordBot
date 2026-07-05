@@ -1,4 +1,4 @@
-package tokyo.archangel.sdb.config;
+package tokyo.archangel.sdb.internal.config;
 
 import java.util.Map;
 
@@ -117,8 +117,9 @@ public class DiscordBotConfiguration {
 	 */
 	@Bean
 	@Scope("prototype")
-	HeartBeatServiceImpl heartBeatService(GatewayInfo gatewayInfo) {
-		return new HeartBeatServiceImpl(gatewayInfo);
+	HeartBeatServiceImpl heartBeatService(GatewayInfo gatewayInfo,
+			SendMessageServiceProvider sendMessageServiceProvider) {
+		return new HeartBeatServiceImpl(gatewayInfo, sendMessageServiceProvider);
 	}
 
 	/**

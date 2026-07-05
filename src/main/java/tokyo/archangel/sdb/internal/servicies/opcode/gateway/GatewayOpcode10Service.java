@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.core.env.Environment;
 
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.config.ApplicationProperties;
 import tokyo.archangel.sdb.internal.component.gateway.GatewayInfo;
+import tokyo.archangel.sdb.internal.config.ApplicationProperties;
 import tokyo.archangel.sdb.internal.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.internal.dto.gateway.opcode.code0.ready.ReadyDetail;
 import tokyo.archangel.sdb.internal.dto.gateway.opcode.code10.Code10Dto;
@@ -70,7 +70,7 @@ public class GatewayOpcode10Service implements GatewayOpcodeServiceInterface {
 		sendMessageService.sendMessage(json);
 		HeartBeatService heartBeatService = heartBeatServiceProvider
 				.getHeartBeatService(sendMessageService.getSession());
-		heartBeatService.setSendMessageService(sendMessageService);
+		heartBeatService.setSendMessageService(sendMessageService.getSession());
 		heartBeatService.exec(interval, "gateway");
 	}
 

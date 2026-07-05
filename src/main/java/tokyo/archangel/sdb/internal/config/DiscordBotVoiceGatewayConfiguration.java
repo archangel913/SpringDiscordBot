@@ -1,4 +1,4 @@
-package tokyo.archangel.sdb.config;
+package tokyo.archangel.sdb.internal.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
