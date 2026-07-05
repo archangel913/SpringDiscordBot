@@ -1,5 +1,8 @@
 package tokyo.archangel.sdb.internal.voice;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.internal.component.voice.VoiceChannelInfo;
 import tokyo.archangel.sdb.internal.component.voice.VoiceChannels;
@@ -26,6 +29,10 @@ public class VoiceSenderImpl implements VoiceSender {
 
 	private VoiceBinaryBuffer binaryBuffer;
 
+	private List<Runnable> connectEvent = new ArrayList<>();
+
+	private List<Runnable> disconnectEvent = new ArrayList<>();
+
 	private boolean isMute = false;
 
 	private boolean isDeaf = false;
@@ -47,6 +54,15 @@ public class VoiceSenderImpl implements VoiceSender {
 
 	@Override
 	public void connect(String guildId, String channelId) {
+		for (Runnable runnable : connectEvent) {
+			try {
+				runnable.run();
+			} catch (Exception e) {
+				log.error("ボイスチャンネル接続時イベントで例外が発生しました。"
+						+ "ギルドID:" + guildId + "  チャンネルID:" + channelId, e);
+			}
+		}
+
 		voiceInfo = voiceChannels.generateInfo(channelId);
 		voiceInfo.setConnectingState(ConnectingState.CONNECTING);
 
@@ -73,6 +89,15 @@ public class VoiceSenderImpl implements VoiceSender {
 		if (voiceInfo == null) {
 			log.warn("音声情報の取得に失敗しました。音声が接続されているか確認してください。");
 			return;
+		}
+
+		for (Runnable runnable : disconnectEvent) {
+			try {
+				runnable.run();
+			} catch (Exception e) {
+				log.error("ボイスチャンネル接続時イベントで例外が発生しました。"
+						+ "ギルドID:" + voiceInfo.getGuildId() + "  チャンネルID:" + voiceInfo.getChannelId(), e);
+			}
 		}
 
 		VoiceSendService sendService = voiceSessionProvider.getVoiceSendService(voiceInfo.getWebsocketGuid());
@@ -127,8 +152,28 @@ public class VoiceSenderImpl implements VoiceSender {
 		this.isMute = isMute;
 	}
 
+	@Override
 	public void setDeaf(boolean isDeaf) {
 		this.isDeaf = isDeaf;
 	}
 
+	@Override
+	public void addConnectEvent(Runnable process) {
+		connectEvent.add(process);
+	}
+
+	@Override
+	public boolean removeConnectEvent(Runnable process) {
+		return connectEvent.remove(process);
+	}
+
+	@Override
+	public void addDisconnectEvent(Runnable process) {
+		disconnectEvent.add(process);
+	}
+
+	@Override
+	public boolean removeDisconnectEvent(Runnable process) {
+		return disconnectEvent.remove(process);
+	}
 }

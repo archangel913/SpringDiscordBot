@@ -77,4 +77,32 @@ public interface VoiceSender {
 	 * @param isMute
 	 */
 	public void setDeaf(boolean isDeaf);
+
+	/**
+	 * ボイスチャンネル接続時のイベントを登録します。<br>
+	 * 発火タイミングは{@link VoiceSender#connect(String, String)}呼び出し直後です。
+	 * @param process
+	 */
+	public void addConnectEvent(Runnable process);
+
+	/**
+	 * ボイスチャンネル接続時のイベントを削除します。<br>
+	 * 引数には{@link VoiceSender#addConnectEvent(Runnable)}に渡した引数と同じインスタンスを渡してください。
+	 * @return 削除に成功すればtrue
+	 */
+	public boolean removeConnectEvent(Runnable process);
+
+	/**
+	 * ボイスチャンネル切断時のイベントを登録します。<br>
+	 * 発火タイミングは{@link VoiceSender#disconnect()}呼び出し直後です。
+	 * @param process
+	 */
+	public void addDisconnectEvent(Runnable process);
+
+	/**
+	 * ボイスチャンネル切断時のイベントを削除します。<br>
+	 * 引数には{@link VoiceSender#addConnectEvent(Runnable)}に渡した引数と同じインスタンスを渡してください。
+	 * @return 削除に成功すればtrue
+	 */
+	public boolean removeDisconnectEvent(Runnable process);
 }
