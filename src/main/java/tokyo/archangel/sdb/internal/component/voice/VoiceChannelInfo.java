@@ -85,12 +85,12 @@ public class VoiceChannelInfo {
 	/**
 	 * マイクミュートか
 	 */
-	private boolean mute;
+	private boolean mute = false;
 
 	/**
 	 * スピーカーミュートか
 	 */
-	private boolean deaf;
+	private boolean deaf = false;
 
 	/**
 	 * シーケンス

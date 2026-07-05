@@ -17,7 +17,7 @@ import tools.jackson.databind.ObjectMapper;
 @Slf4j
 public class VoiceSenderImpl implements VoiceSender {
 	private SendMessageServiceProvider sendMessageServiceProvider;
-	
+
 	private VoiceResourceProvider voiceSessionProvider;
 
 	private VoiceChannels voiceChannels;
@@ -25,6 +25,10 @@ public class VoiceSenderImpl implements VoiceSender {
 	private VoiceChannelInfo voiceInfo;
 
 	private VoiceBinaryBuffer binaryBuffer;
+
+	private boolean isMute = false;
+
+	private boolean isDeaf = false;
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -42,16 +46,16 @@ public class VoiceSenderImpl implements VoiceSender {
 	}
 
 	@Override
-	public void connect(String guildId, String channelId, boolean selfMute,
-			boolean selfDeaf) {
+	public void connect(String guildId, String channelId) {
 		voiceInfo = voiceChannels.generateInfo(channelId);
 		voiceInfo.setConnectingState(ConnectingState.CONNECTING);
-		
-		voiceInfo.setMute(selfMute);
-		voiceInfo.setDeaf(selfDeaf);
 
+		voiceInfo.setMute(isMute);
+		voiceInfo.setDeaf(isDeaf);
+
+		// TODO 途中でミュート状態が変わったときの対応
 		SendMessageService messageService = sendMessageServiceProvider.getServiceByChannelId(GATEWAY);
-		Code4Dto dto = new Code4Dto(new Code4Detail(guildId, channelId, selfMute, selfDeaf));
+		Code4Dto dto = new Code4Dto(new Code4Detail(guildId, channelId, isMute, isDeaf));
 		String json = objectMapper.writeValueAsString(dto);
 		messageService.sendMessage(json);
 
@@ -72,15 +76,17 @@ public class VoiceSenderImpl implements VoiceSender {
 		}
 
 		VoiceSendService sendService = voiceSessionProvider.getVoiceSendService(voiceInfo.getWebsocketGuid());
-		if(sendService == null) {
+		if (sendService == null) {
 			log.warn("切断対象のサービスが見つかりません");
 			return;
 		}
-		sendService.close();
+
+		// バッファのクリア
+		binaryBuffer.clear();
 
 		// UDP切断周りの処理はVoiceServiceに集約させる
 		SendMessageService messageService = sendMessageServiceProvider.getServiceByChannelId(GATEWAY);
-		Code4Dto dto = new Code4Dto(new Code4Detail(voiceInfo.getGuildId(), null, false, false));
+		Code4Dto dto = new Code4Dto(new Code4Detail(voiceInfo.getGuildId(), null, isMute, isDeaf));
 		String json = objectMapper.writeValueAsString(dto);
 		messageService.sendMessage(json);
 	}
@@ -90,25 +96,39 @@ public class VoiceSenderImpl implements VoiceSender {
 		// 実質このメソッドはバッファへバイナリを格納するだけのお仕事
 		binaryBuffer.add(data);
 	}
-	
+
+	@Override
+	public void clearBuffer() {
+		binaryBuffer.clear();
+	}
+
 	@Override
 	public void pause() {
 		VoiceSendService sendService = voiceSessionProvider.getVoiceSendService(voiceInfo.getWebsocketGuid());
-		if(sendService == null) {
+		if (sendService == null) {
 			log.warn("操作対象のサービスが見つかりません");
 			return;
 		}
 		sendService.pause();
 	}
-	
+
 	@Override
 	public void resume() {
 		VoiceSendService sendService = voiceSessionProvider.getVoiceSendService(voiceInfo.getWebsocketGuid());
-		if(sendService == null) {
+		if (sendService == null) {
 			log.warn("操作対象のサービスが見つかりません");
 			return;
 		}
 		sendService.resume();
+	}
+
+	@Override
+	public void setMute(boolean isMute) {
+		this.isMute = isMute;
+	}
+
+	public void setDeaf(boolean isDeaf) {
+		this.isDeaf = isDeaf;
 	}
 
 }
