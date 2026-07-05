@@ -152,8 +152,9 @@ public class DiscordBotConfiguration {
 	 * ゲートウェイサービスクラス
 	 */
 	@Bean
-	GatewayService gatewayService(GatewayOpcodeServiceFactory opcodeServiceFactory, GatewayInfo gatewayInfo) {
-		return new GatewayService(opcodeServiceFactory, gatewayInfo);
+	GatewayService gatewayService(GatewayOpcodeServiceFactory opcodeServiceFactory, GatewayInfo gatewayInfo,
+			HeartBeatServiceProvider heartbeatServiceProvider) {
+		return new GatewayService(opcodeServiceFactory, gatewayInfo, heartbeatServiceProvider);
 	}
 
 	/**

@@ -25,9 +25,11 @@ public class GatewayService {
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	public GatewayService(GatewayOpcodeServiceFactory opcodeServiceFactory, GatewayInfo gatewayInfo) {
+	public GatewayService(GatewayOpcodeServiceFactory opcodeServiceFactory, GatewayInfo gatewayInfo,
+			HeartBeatServiceProvider heartbeatServiceProvider) {
 		this.opcodeServiceFactory = opcodeServiceFactory;
 		this.gatewayInfo = gatewayInfo;
+		this.heartbeatServiceProvider = heartbeatServiceProvider;
 	}
 
 	public void receive(String json, SendMessageService service) {
