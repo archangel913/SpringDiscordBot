@@ -1,5 +1,7 @@
 package tokyo.archangel.sdb.internal.websocket;
 
+import jakarta.annotation.PreDestroy;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.socket.CloseStatus;
@@ -7,11 +9,10 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.config.ApplicationProperties;
 import tokyo.archangel.sdb.internal.api.DiscordApi;
 import tokyo.archangel.sdb.internal.component.gateway.GatewayInfo;
+import tokyo.archangel.sdb.internal.config.ApplicationProperties;
 import tokyo.archangel.sdb.internal.enumeration.GatewayWebsocketCode;
 import tokyo.archangel.sdb.internal.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.internal.servicies.gateway.GatewayConnectionService;

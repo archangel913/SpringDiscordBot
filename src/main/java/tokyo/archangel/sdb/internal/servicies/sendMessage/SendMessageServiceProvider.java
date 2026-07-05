@@ -4,12 +4,13 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import jakarta.annotation.PreDestroy;
+
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.web.socket.WebSocketSession;
 
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.config.ApplicationProperties;
+import tokyo.archangel.sdb.internal.config.ApplicationProperties;
 
 /**
  * メッセージ送信用サービスを提供するクラス
