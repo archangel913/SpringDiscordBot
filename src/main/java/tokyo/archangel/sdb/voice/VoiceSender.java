@@ -80,21 +80,21 @@ public interface VoiceSender {
 
 	/**
 	 * ボイスチャンネル接続時のイベントを登録します。<br>
-	 * 発火タイミングは{@link VoiceSender#connect(String, String)}呼び出し直後です。
+	 * 発火タイミングは音声の送受信準備完了のタイミングです。
 	 * @param process
 	 */
-	public void addConnectEvent(Runnable process);
+	public void addConnectedEvent(Runnable process);
 
 	/**
 	 * ボイスチャンネル接続時のイベントを削除します。<br>
 	 * 引数には{@link VoiceSender#addConnectEvent(Runnable)}に渡した引数と同じインスタンスを渡してください。
 	 * @return 削除に成功すればtrue
 	 */
-	public boolean removeConnectEvent(Runnable process);
+	public boolean removeConnectedEvent(Runnable process);
 
 	/**
 	 * ボイスチャンネル切断時のイベントを登録します。<br>
-	 * 発火タイミングは{@link VoiceSender#disconnect()}呼び出し直後です。
+	 * 発火タイミングはdiscordから切断(4014受信時等)された時です。
 	 * @param process
 	 */
 	public void addDisconnectEvent(Runnable process);

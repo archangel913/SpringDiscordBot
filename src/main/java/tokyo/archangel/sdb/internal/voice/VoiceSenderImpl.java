@@ -29,7 +29,7 @@ public class VoiceSenderImpl implements VoiceSender {
 
 	private VoiceBinaryBuffer binaryBuffer;
 
-	private List<Runnable> connectEvent = new ArrayList<>();
+	private List<Runnable> connectedEvent = new ArrayList<>();
 
 	private List<Runnable> disconnectEvent = new ArrayList<>();
 
@@ -54,17 +54,10 @@ public class VoiceSenderImpl implements VoiceSender {
 
 	@Override
 	public void connect(String guildId, String channelId) {
-		for (Runnable runnable : connectEvent) {
-			try {
-				runnable.run();
-			} catch (Exception e) {
-				log.error("ボイスチャンネル接続時イベントで例外が発生しました。"
-						+ "ギルドID:" + guildId + "  チャンネルID:" + channelId, e);
-			}
-		}
-
 		voiceInfo = voiceChannels.generateInfo(channelId);
 		voiceInfo.setConnectingState(ConnectingState.CONNECTING);
+
+		voiceInfo.setDisconnectEvent(disconnectEvent);
 
 		voiceInfo.setMute(isMute);
 		voiceInfo.setDeaf(isDeaf);
@@ -77,6 +70,15 @@ public class VoiceSenderImpl implements VoiceSender {
 
 		// 音声が送信可能になるまで待機
 		voiceInfo.getReadyFuture().join();
+
+		for (Runnable runnable : connectedEvent) {
+			try {
+				runnable.run();
+			} catch (Exception e) {
+				log.error("ボイスチャンネル接続時イベントで例外が発生しました。"
+						+ "ギルドID:" + guildId + "  チャンネルID:" + channelId, e);
+			}
+		}
 
 		// 送信ループ実行
 		voiceSessionProvider.getVoiceSendService(voiceInfo.getWebsocketGuid(), binaryBuffer, voiceInfo);
@@ -158,13 +160,13 @@ public class VoiceSenderImpl implements VoiceSender {
 	}
 
 	@Override
-	public void addConnectEvent(Runnable process) {
-		connectEvent.add(process);
+	public void addConnectedEvent(Runnable process) {
+		connectedEvent.add(process);
 	}
 
 	@Override
-	public boolean removeConnectEvent(Runnable process) {
-		return connectEvent.remove(process);
+	public boolean removeConnectedEvent(Runnable process) {
+		return connectedEvent.remove(process);
 	}
 
 	@Override

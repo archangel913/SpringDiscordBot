@@ -185,6 +185,16 @@ public class VoiceService {
 	public boolean close(WebSocketSession session) {
 		VoiceChannelInfo voiceInfo = channels.getInfoByWebsocketGuid(session.getId());
 		String channelId = voiceInfo.getChannelId();
+		String guildId = voiceInfo.getGuildId();
+
+		for (Runnable runnable : voiceInfo.getDisconnectEvent()) {
+			try {
+				runnable.run();
+			} catch (Exception e) {
+				log.error("ボイスチャンネル接続時イベントで例外が発生しました。"
+						+ "ギルドID:" + guildId + "  チャンネルID:" + channelId, e);
+			}
+		}
 
 		heartBeatServiceProvider.removeService(session);
 

@@ -111,4 +111,9 @@ public class VoiceChannelInfo {
 	 * 再接続を何回したか
 	 */
 	private int connectionFailCount = 0;
+
+	/**
+	 * 音声切断時のイベント
+	 */
+	private List<Runnable> disconnectEvent = new ArrayList<>();
 }
