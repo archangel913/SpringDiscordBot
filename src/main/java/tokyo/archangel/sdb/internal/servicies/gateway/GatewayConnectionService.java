@@ -28,6 +28,6 @@ public class GatewayConnectionService {
 					} else {
 						log.error("websocket接続失敗", ex);
 					}
-				}).join();
+				});
 	}
 }

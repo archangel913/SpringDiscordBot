@@ -16,7 +16,6 @@ import tokyo.archangel.sdb.internal.dto.gateway.opcode.code2.Properties;
 import tokyo.archangel.sdb.internal.dto.gateway.opcode.code6.Code6Detail;
 import tokyo.archangel.sdb.internal.dto.gateway.opcode.code6.Code6Dto;
 import tokyo.archangel.sdb.internal.enumeration.Intent;
-import tokyo.archangel.sdb.internal.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.internal.servicies.heartbeat.HeartBeatService;
 import tokyo.archangel.sdb.internal.servicies.heartbeat.HeartBeatServiceProvider;
 import tokyo.archangel.sdb.internal.servicies.sendMessage.SendMessageService;
@@ -59,13 +58,16 @@ public class GatewayOpcode10Service implements GatewayOpcodeServiceInterface {
 
 		String json;
 		log.debug("ボットを接続します");
-		if (gatewayInfo.getReconnectMode() == ReconnectMode.NORMAL) {
+		if (gatewayInfo.isResume()) {
 			json = objectMapper.writeValueAsString(generateCode6Dto());
 			log.debug("Resumeオペコードを送信します");
 		} else {
 			json = objectMapper.writeValueAsString(generateCode2Dto());
 			log.debug("Identifyオペコードを送信します");
 		}
+		
+		// 再接続は基本Resume
+		gatewayInfo.setResume(true);
 
 		sendMessageService.sendMessage(json);
 		HeartBeatService heartBeatService = heartBeatServiceProvider

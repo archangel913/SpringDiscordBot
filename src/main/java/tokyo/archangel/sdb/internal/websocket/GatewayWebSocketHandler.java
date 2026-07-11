@@ -14,7 +14,6 @@ import tokyo.archangel.sdb.internal.api.DiscordApi;
 import tokyo.archangel.sdb.internal.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.internal.config.ApplicationProperties;
 import tokyo.archangel.sdb.internal.enumeration.GatewayWebsocketCode;
-import tokyo.archangel.sdb.internal.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.internal.servicies.gateway.GatewayConnectionService;
 import tokyo.archangel.sdb.internal.servicies.gateway.GatewayService;
 import tokyo.archangel.sdb.internal.servicies.sendMessage.SendMessageService;
@@ -100,20 +99,23 @@ public class GatewayWebSocketHandler extends TextWebSocketHandler {
 
 			// 再接続不可の場合、認証からやり直す
 			if (!code.canReconnect()) {
-				gatewayInfo.setReconnectMode(ReconnectMode.HARD);
+				gatewayInfo.setResume(false);
 			}
 		}
 
 		// 再接続URL取得
 		String connectUrl;
-		if (gatewayInfo.getReconnectMode() == ReconnectMode.NORMAL) {
+		if (gatewayInfo.isResume()) {
 			connectUrl = gatewayInfo.getReadyDetail().getResumeGatewayUrl();
 		} else {
 			connectUrl = api.getGatewayUrl();
 		}
 		connectUrl += "/?v=10&encoding=json";
 
-		log.debug("再接続を行います");
+		log.debug("再接続を行います resume:" + gatewayInfo.isResume() + "  url:" + connectUrl);
+
+		Thread.sleep(1000);
+
 		// ディスコード再接続
 		gatewayConnectionService.connect(connectUrl);
 	}
