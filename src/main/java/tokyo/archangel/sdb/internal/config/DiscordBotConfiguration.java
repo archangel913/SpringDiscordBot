@@ -291,6 +291,7 @@ public class DiscordBotConfiguration {
 	 * opusエンコードクラス
 	 */
 	@Bean
+	@Scope("prototype")
 	OpusEncodeService opusEncodeService() {
 		return new OpusEncodeService();
 	}
