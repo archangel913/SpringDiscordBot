@@ -12,7 +12,7 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.config.ApplicationProperties;
+import tokyo.archangel.sdb.internal.config.ApplicationProperties;
 import tokyo.archangel.sdb.internal.enumeration.ServiceThreadStatus;
 
 /**
@@ -142,9 +142,11 @@ public class SendMessageServiceImpl implements SendMessageService {
 
 	private void shutdown() {
 		try {
-			log.debug("websocketを切断します");
-			session.close();
-			log.info("discordから切断完了。");
+			if (session.isOpen()) {
+				log.debug("websocketを切断します");
+				session.close();
+				log.info("discordから切断完了。");
+			}
 		} catch (IOException e) {
 			log.error("discordの切断中にエラーが発生しました。", e);
 		}

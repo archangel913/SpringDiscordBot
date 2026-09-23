@@ -3,7 +3,6 @@ package tokyo.archangel.sdb.internal.servicies.opcode.gateway;
 import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.internal.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.internal.dto.gateway.OpCodeReceiveBaseDto;
-import tokyo.archangel.sdb.internal.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.internal.servicies.heartbeat.HeartBeatServiceProvider;
 import tokyo.archangel.sdb.internal.servicies.sendMessage.SendMessageService;
 
@@ -26,8 +25,7 @@ public class GatewayOpcode7Service implements GatewayOpcodeServiceInterface {
 	@Override
 	public void exec(OpCodeReceiveBaseDto dto) {
 		log.info("再接続します。");
-		gatewayInfo.setReconnectMode(ReconnectMode.NORMAL);
-		heartBeatServiceProvider.removeService(sendMessageService.getSession());
+		gatewayInfo.setResume(true);
 	}
 
 	@Override

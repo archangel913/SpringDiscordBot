@@ -11,6 +11,7 @@ import tokyo.archangel.sdb.internal.dto.NotImplementCodeDto;
 import tokyo.archangel.sdb.internal.dto.TargetServiceNameObtainable;
 import tokyo.archangel.sdb.internal.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.internal.dto.gateway.opcode.code0.ready.ReadyDetail;
+import tokyo.archangel.sdb.internal.dto.gateway.opcode.code0.resumed.ResumedDetail;
 import tokyo.archangel.sdb.internal.dto.gateway.opcode.code0.voicechannelstarttimeupdate.VoiceChannelStartTimeUpdateDetail;
 import tokyo.archangel.sdb.internal.dto.gateway.opcode.code0.voicechannelstatusupdate.VoiceChannelStatusUpdateDetail;
 import tokyo.archangel.sdb.internal.dto.gateway.opcode.code0.voiceserverupdate.VoiceServerUpdateDetail;
@@ -29,6 +30,7 @@ public class Code0Dto extends OpCodeReceiveBaseDto {
 			@JsonSubTypes.Type(value = VoiceStateUpdateDetail.class, name = "VOICE_STATE_UPDATE"),
 			@JsonSubTypes.Type(value = VoiceChannelStartTimeUpdateDetail.class, name = "VOICE_CHANNEL_START_TIME_UPDATE"),
 			@JsonSubTypes.Type(value = VoiceChannelStatusUpdateDetail.class, name = "VOICE_CHANNEL_STATUS_UPDATE"),
+			@JsonSubTypes.Type(value = ResumedDetail.class, name = "RESUMED"),
 	})
 	@JsonProperty("d")
 	private EventDetailBase detail;

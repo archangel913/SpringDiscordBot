@@ -1,4 +1,4 @@
-package tokyo.archangel.sdb.config;
+package tokyo.archangel.sdb.internal.config;
 
 import java.util.Map;
 
@@ -22,6 +22,8 @@ import tokyo.archangel.sdb.internal.component.voice.VoiceChannels;
 import tokyo.archangel.sdb.internal.launcher.DiscordServiceLauncher;
 import tokyo.archangel.sdb.internal.servicies.gateway.GatewayConnectionService;
 import tokyo.archangel.sdb.internal.servicies.gateway.GatewayService;
+import tokyo.archangel.sdb.internal.servicies.gateway.StandardWebSocketClientProvider;
+import tokyo.archangel.sdb.internal.servicies.gateway.WebSocketClientProvider;
 import tokyo.archangel.sdb.internal.servicies.heartbeat.HeartBeatServiceImpl;
 import tokyo.archangel.sdb.internal.servicies.heartbeat.HeartBeatServiceProvider;
 import tokyo.archangel.sdb.internal.servicies.libdave.E2eeCryptServiceImpl;
@@ -117,8 +119,9 @@ public class DiscordBotConfiguration {
 	 */
 	@Bean
 	@Scope("prototype")
-	HeartBeatServiceImpl heartBeatService(GatewayInfo gatewayInfo) {
-		return new HeartBeatServiceImpl(gatewayInfo);
+	HeartBeatServiceImpl heartBeatService(GatewayInfo gatewayInfo,
+			SendMessageServiceProvider sendMessageServiceProvider) {
+		return new HeartBeatServiceImpl(gatewayInfo, sendMessageServiceProvider);
 	}
 
 	/**
@@ -143,16 +146,27 @@ public class DiscordBotConfiguration {
 	 * ゲートウェイ接続クラス
 	 */
 	@Bean
-	GatewayConnectionService gatewayConnectionService(GatewayWebSocketHandler discordWebSocketHandler) {
-		return new GatewayConnectionService(discordWebSocketHandler);
+	GatewayConnectionService gatewayConnectionService(GatewayWebSocketHandler discordWebSocketHandler,
+			WebSocketClientProvider webSocketClientProvider) {
+		return new GatewayConnectionService(discordWebSocketHandler, webSocketClientProvider);
+	}
+
+	/**
+	 * WebSocketClientのプロバイダー
+	 */
+	@Bean
+	@ConditionalOnMissingBean
+	WebSocketClientProvider webSocketClientProvider() {
+		return new StandardWebSocketClientProvider();
 	}
 
 	/**
 	 * ゲートウェイサービスクラス
 	 */
 	@Bean
-	GatewayService gatewayService(GatewayOpcodeServiceFactory opcodeServiceFactory, GatewayInfo gatewayInfo) {
-		return new GatewayService(opcodeServiceFactory, gatewayInfo);
+	GatewayService gatewayService(GatewayOpcodeServiceFactory opcodeServiceFactory, GatewayInfo gatewayInfo,
+			HeartBeatServiceProvider heartbeatServiceProvider) {
+		return new GatewayService(opcodeServiceFactory, gatewayInfo, heartbeatServiceProvider);
 	}
 
 	/**
@@ -289,6 +303,7 @@ public class DiscordBotConfiguration {
 	 * opusエンコードクラス
 	 */
 	@Bean
+	@Scope("prototype")
 	OpusEncodeService opusEncodeService() {
 		return new OpusEncodeService();
 	}

@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import tokyo.archangel.sdb.internal.component.gateway.GatewayInfo;
 import tokyo.archangel.sdb.internal.dto.gateway.OpCodeReceiveBaseDto;
 import tokyo.archangel.sdb.internal.dto.gateway.opcode.code9.Code9Dto;
-import tokyo.archangel.sdb.internal.enumeration.ReconnectMode;
 import tokyo.archangel.sdb.internal.servicies.heartbeat.HeartBeatServiceProvider;
 import tokyo.archangel.sdb.internal.servicies.sendMessage.SendMessageService;
 
@@ -39,14 +38,12 @@ public class GatewayOpcode9Service implements GatewayOpcodeServiceInterface {
 		if (code9dto.getD()) {
 			// 再接続(opcode6)を行う
 			log.info("再接続します。再接続用URLを使用します。");
-			gatewayInfo.setReconnectMode(ReconnectMode.NORMAL);
+			gatewayInfo.setResume(true);
 		} else {
 			// 再接続(opcode2)を行う
 			log.info("接続します。初期URLを使用します。");
-			gatewayInfo.setReconnectMode(ReconnectMode.HARD);
+			gatewayInfo.setResume(false);
 		}
-
-		heartBeatServiceProvider.removeService(sendMessageService.getSession());
 	}
 
 	@Override

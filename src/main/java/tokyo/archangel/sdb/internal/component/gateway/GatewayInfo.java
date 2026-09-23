@@ -3,7 +3,6 @@ package tokyo.archangel.sdb.internal.component.gateway;
 import lombok.Getter;
 import lombok.Setter;
 import tokyo.archangel.sdb.internal.dto.gateway.opcode.code0.ready.ReadyDetail;
-import tokyo.archangel.sdb.internal.enumeration.ReconnectMode;
 
 @Getter
 @Setter
@@ -16,9 +15,9 @@ public class GatewayInfo {
 	private int connectionFailCount = 0;
 
 	/** 
-	 * 再接続の方法
+	 * resumeによる再接続を行うか
 	 */
-	private ReconnectMode reconnectMode = ReconnectMode.NONE;
+	private boolean isResume = false;
 
 	/**
 	 * ディスコードから送信されたシーケンス

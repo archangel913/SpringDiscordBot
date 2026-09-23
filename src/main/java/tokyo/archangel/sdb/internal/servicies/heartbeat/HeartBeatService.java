@@ -2,8 +2,9 @@ package tokyo.archangel.sdb.internal.servicies.heartbeat;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.springframework.web.socket.WebSocketSession;
+
 import tokyo.archangel.sdb.internal.component.voice.VoiceChannelInfo;
-import tokyo.archangel.sdb.internal.servicies.sendMessage.SendMessageService;
 
 public interface HeartBeatService {
 	/**
@@ -17,7 +18,7 @@ public interface HeartBeatService {
 	 * メッセージサービスを設定する
 	 * @param sendMessageService
 	 */
-	public void setSendMessageService(SendMessageService sendMessageService);
+	public void setSendMessageService(WebSocketSession session);
 
 	/**
 	 * 処理を実行する

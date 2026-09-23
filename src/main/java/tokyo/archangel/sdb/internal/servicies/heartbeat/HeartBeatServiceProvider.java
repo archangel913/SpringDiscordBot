@@ -3,10 +3,11 @@ package tokyo.archangel.sdb.internal.servicies.heartbeat;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import jakarta.annotation.PreDestroy;
+
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.web.socket.WebSocketSession;
 
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -38,7 +39,16 @@ public class HeartBeatServiceProvider {
 	 * @param session
 	 */
 	public void removeService(WebSocketSession session) {
+		if (session == null) {
+			log.warn("セッションがnullのため削除を行いません。");
+			return;
+		}
+
 		HeartBeatService heartBeatService = heartBeatServices.remove(session.getId());
+		if (heartBeatService == null) {
+			// すでに削除済みのため操作を行わない
+			return;
+		}
 		heartBeatService.close();
 		log.debug("ハートビートサービスを削除しました。現在有効なサービスは{}個です", heartBeatServices.size());
 	}

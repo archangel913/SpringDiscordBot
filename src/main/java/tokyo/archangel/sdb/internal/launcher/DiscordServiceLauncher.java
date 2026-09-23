@@ -8,8 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 
 import lombok.extern.slf4j.Slf4j;
-import tokyo.archangel.sdb.config.ApplicationProperties;
 import tokyo.archangel.sdb.internal.api.DiscordApi;
+import tokyo.archangel.sdb.internal.config.ApplicationProperties;
 import tokyo.archangel.sdb.internal.enumeration.Intent;
 import tokyo.archangel.sdb.internal.servicies.gateway.GatewayConnectionService;
 
