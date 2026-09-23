@@ -22,6 +22,8 @@ import tokyo.archangel.sdb.internal.component.voice.VoiceChannels;
 import tokyo.archangel.sdb.internal.launcher.DiscordServiceLauncher;
 import tokyo.archangel.sdb.internal.servicies.gateway.GatewayConnectionService;
 import tokyo.archangel.sdb.internal.servicies.gateway.GatewayService;
+import tokyo.archangel.sdb.internal.servicies.gateway.StandardWebSocketClientProvider;
+import tokyo.archangel.sdb.internal.servicies.gateway.WebSocketClientProvider;
 import tokyo.archangel.sdb.internal.servicies.heartbeat.HeartBeatServiceImpl;
 import tokyo.archangel.sdb.internal.servicies.heartbeat.HeartBeatServiceProvider;
 import tokyo.archangel.sdb.internal.servicies.libdave.E2eeCryptServiceImpl;
@@ -144,8 +146,18 @@ public class DiscordBotConfiguration {
 	 * ゲートウェイ接続クラス
 	 */
 	@Bean
-	GatewayConnectionService gatewayConnectionService(GatewayWebSocketHandler discordWebSocketHandler) {
-		return new GatewayConnectionService(discordWebSocketHandler);
+	GatewayConnectionService gatewayConnectionService(GatewayWebSocketHandler discordWebSocketHandler,
+			WebSocketClientProvider webSocketClientProvider) {
+		return new GatewayConnectionService(discordWebSocketHandler, webSocketClientProvider);
+	}
+
+	/**
+	 * WebSocketClientのプロバイダー
+	 */
+	@Bean
+	@ConditionalOnMissingBean
+	WebSocketClientProvider webSocketClientProvider() {
+		return new StandardWebSocketClientProvider();
 	}
 
 	/**
