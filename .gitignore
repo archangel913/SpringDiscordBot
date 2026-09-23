@@ -60,3 +60,7 @@ replay_pid*
 
 # リソパも対象外とする
 application-dev.properties
+
+# claude関連
+CLAUDE.md
+.claude/

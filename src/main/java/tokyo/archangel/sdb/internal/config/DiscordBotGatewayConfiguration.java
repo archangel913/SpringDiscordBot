@@ -14,6 +14,7 @@ import tokyo.archangel.sdb.internal.servicies.opcode.gateway.GatewayOpcode1Servi
 import tokyo.archangel.sdb.internal.servicies.opcode.gateway.GatewayOpcode7Service;
 import tokyo.archangel.sdb.internal.servicies.opcode.gateway.GatewayOpcode9Service;
 import tokyo.archangel.sdb.internal.servicies.opcode.gateway.dispatch.ReadyEventService;
+import tokyo.archangel.sdb.internal.servicies.opcode.gateway.dispatch.ResumedService;
 import tokyo.archangel.sdb.internal.servicies.opcode.gateway.dispatch.VoiceChannelStartTimeUpdateService;
 import tokyo.archangel.sdb.internal.servicies.opcode.gateway.dispatch.VoiceChannelStatusUpdateService;
 import tokyo.archangel.sdb.internal.servicies.opcode.gateway.dispatch.VoiceServerUpdateEventService;
@@ -35,6 +36,14 @@ public class DiscordBotGatewayConfiguration {
 	@Bean
 	ReadyEventService readyEventService(GatewayInfo gatewayInfo) {
 		return new ReadyEventService(gatewayInfo);
+	}
+
+	/**
+	 * opcode0,RESUMEDのサービスクラス
+	 */
+	@Bean
+	ResumedService resumedService(GatewayInfo gatewayInfo) {
+		return new ResumedService(gatewayInfo);
 	}
 
 	/**
